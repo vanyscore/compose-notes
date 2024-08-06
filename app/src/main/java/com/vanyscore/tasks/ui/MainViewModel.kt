@@ -48,6 +48,13 @@ class MainViewModel(
         }
     }
 
+    fun editTask(task: Task) {
+        viewModelScope.launch {
+            repository.updateTask(task)
+            refresh()
+        }
+    }
+
 }
 
 data class MainViewState(

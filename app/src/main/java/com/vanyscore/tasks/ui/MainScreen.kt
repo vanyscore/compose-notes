@@ -1,6 +1,8 @@
 package com.vanyscore.tasks.ui
 
-import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -36,13 +38,26 @@ fun MainScreen(
     val dialogState = remember {
         mutableStateOf(false)
     }
+    val editTaskState = remember {
+        mutableStateOf<Task?>(null)
+    }
+
+    fun closeDialog() {
+        dialogState.value = false
+        editTaskState.value = null
+    }
 
     if (dialogState.value) {
-        EditTaskDialog(task = null, onResult = { task ->
-            viewModel.createTask(task)
-            dialogState.value = false
+        val isEdit = editTaskState.value != null
+        EditTaskDialog(task = editTaskState.value, onResult = { task ->
+            closeDialog()
+            if (!isEdit) {
+                viewModel.createTask(task)
+            } else {
+                viewModel.editTask(task)
+            }
         }) {
-            dialogState.value = false
+            closeDialog()
         }
     }
 
@@ -76,6 +91,10 @@ fun MainScreen(
                     onTaskChanged = { updated ->
                         viewModel.taskStatusUpdated(updated)
                     },
+                    onTaskEdit = { editTask ->
+                        dialogState.value = true
+                        editTaskState.value = editTask
+                    }
                 )
             }
         }
@@ -93,18 +112,27 @@ fun DayPickerBar() {
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TaskItem(
     task: Task,
-    onTaskChanged: (Task) -> Unit
+    onTaskChanged: (Task) -> Unit,
+    onTaskEdit: (Task) -> Unit,
 ) {
     return Box(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
             .fillMaxWidth()
+            .combinedClickable(
+                onClick = {},
+                onLongClick = {
+                    onTaskEdit(task)
+                }
+            )
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
