@@ -1,30 +1,38 @@
 package com.vanyscore.tasks.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.tasks.data.Task
@@ -84,7 +92,9 @@ fun MainScreen(
             item {
                 DayPickerBar()
             }
-            items(tasks.size) {index ->
+            items(tasks.size, key = { index ->
+                tasks[index].id
+            }) {index ->
                 val task = tasks[index]
                 TaskItem(
                     task,
@@ -94,6 +104,9 @@ fun MainScreen(
                     onTaskEdit = { editTask ->
                         dialogState.value = true
                         editTaskState.value = editTask
+                    },
+                    onTaskDelete = { deleteTask ->
+                        viewModel.deleteTask(deleteTask)
                     }
                 )
             }
@@ -112,36 +125,71 @@ fun DayPickerBar() {
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TaskItem(
     task: Task,
     onTaskChanged: (Task) -> Unit,
     onTaskEdit: (Task) -> Unit,
+    onTaskDelete: (Task) -> Unit
 ) {
-    return Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = {},
-                onLongClick = {
-                    onTaskEdit(task)
-                }
-            )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(task.title)
-            Checkbox(checked = task.isSuccess, onCheckedChange = {
-                onTaskChanged(task.copy(
-                    isSuccess = it
-                ))
-            })
+    val swipeState = rememberDismissState(
+        initialValue = DismissValue.Default,
+        confirmValueChange = { value ->
+            if (value == DismissValue.DismissedToEnd) {
+                onTaskDelete(task)
+            }
+            true
         }
-    }
+    )
+    return SwipeToDismiss(
+        state = swipeState,
+        background = {
+            Box(
+                modifier = Modifier
+                    .background(Color.Red)
+                    .fillMaxSize()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxHeight(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        modifier = Modifier
+                            .padding(start = 16.dp),
+                        contentDescription = "Delete",
+                        tint = Color.White
+                    )
+                }
+            }
+        },
+        dismissContent = {
+            Box(modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = {
+                        onTaskEdit(task)
+                    }
+                )) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(task.title)
+                    Checkbox(checked = task.isSuccess, onCheckedChange = {
+                        onTaskChanged(task.copy(
+                            isSuccess = it
+                        ))
+                    })
+                }
+            }
+        },
+        directions = setOf(DismissDirection.StartToEnd)
+    )
 }
