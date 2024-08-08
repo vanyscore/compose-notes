@@ -66,7 +66,7 @@ fun EditTaskDialog(
                         ) ?: Task(
                             title = textValue.value,
                             isSuccess = false,
-                            date = Calendar.getInstance().time
+                            date = date
                         ))
                     }
                 ) {

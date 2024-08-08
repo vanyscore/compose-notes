@@ -2,15 +2,21 @@ package com.vanyscore.tasks.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -25,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,9 +40,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.tasks.data.Task
+import com.vanyscore.tasks.utils.DateUtils
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun MainScreen(
@@ -57,7 +70,9 @@ fun MainScreen(
 
     if (dialogState.value) {
         val isEdit = editTaskState.value != null
-        EditTaskDialog(task = editTaskState.value, onResult = { task ->
+        EditTaskDialog(
+            date = state.date,
+            task = editTaskState.value, onResult = { task ->
             closeDialog()
             if (!isEdit) {
                 viewModel.createTask(task)
@@ -90,7 +105,9 @@ fun MainScreen(
                 .fillMaxSize()
         ) {
             item {
-                DayPickerBar()
+                DayPickerBar { date ->
+                    viewModel.changeDate(date)
+                }
             }
             items(tasks.size, key = { index ->
                 tasks[index].id
@@ -117,12 +134,85 @@ fun MainScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MonthAndYearPickerBar() {
-    return TopAppBar(title = { Text("Список задач") })
+    return TopAppBar(
+        title = { Text("Список задач", style = MaterialTheme.typography.titleLarge.copy(
+            color = Color.White,
+        )) },
+        colors = topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        )
+    )
 }
 
 @Composable
-fun DayPickerBar() {
+fun DayPickerBar(
+    onDaySelected: (Date) -> Unit
+) {
+    val viewModel: MainViewModel = viewModel()
+    val state = viewModel.state.collectAsState()
+    val dates = remember {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR, 0)
+            set(Calendar.MINUTE, 0)
+        }
+        val startDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH)
+        val endDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val list = mutableListOf<Date>()
+        startDay.until(endDay + 1).map { day ->
+            val dateToAdd = calendar.let {
+                it.set(Calendar.DAY_OF_MONTH, day)
+                it.time.clone() as Date
+            }
+            list.add(dateToAdd)
+        }
+        list
+    }
 
+    val dateFormat = remember {
+        SimpleDateFormat("E", Locale.getDefault())
+    }
+
+    return LazyRow {
+        items(dates.size) {
+            val date = dates[it]
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        onDaySelected(date)
+                    }
+                    .background(
+                        if (DateUtils.compareByDay(date, state.value.date))
+                            MaterialTheme.colorScheme.inversePrimary
+                        else MaterialTheme.colorScheme.primary
+                    )
+                    .size(52.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(
+                        calendar.get(Calendar.DAY_OF_MONTH).toString(),
+                        style = TextStyle(
+                            color = Color.White
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        dateFormat.format(date),
+                        style = TextStyle(
+                            color = Color.White
+                        )
+                    )
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)

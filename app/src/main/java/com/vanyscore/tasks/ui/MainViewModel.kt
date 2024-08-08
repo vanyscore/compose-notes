@@ -27,8 +27,8 @@ class MainViewModel(
 
     private fun refresh() {
         viewModelScope.launch {
-            val tasks = repository.getTasks(Calendar.getInstance().time)
-            _state.value = MainViewState(tasks = tasks)
+            val tasks = repository.getTasks(_state.value.date)
+            _state.value = state.value.copy(tasks = tasks)
         }
     }
 
@@ -58,6 +58,15 @@ class MainViewModel(
     fun deleteTask(task: Task) {
         viewModelScope.launch {
             repository.deleteTask(task)
+            refresh()
+        }
+    }
+
+    fun changeDate(date: Date) {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(
+                date = date
+            )
             refresh()
         }
     }

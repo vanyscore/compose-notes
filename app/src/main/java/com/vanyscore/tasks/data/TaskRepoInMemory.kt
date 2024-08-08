@@ -1,6 +1,7 @@
 package com.vanyscore.tasks.data
 
 import android.util.Log
+import com.vanyscore.tasks.utils.DateUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,21 +13,6 @@ class TaskRepoInMemory : ITaskRepo {
     private var _id = 0
     private val _tasks = mutableListOf<Task>()
 
-    private val _scope = CoroutineScope(Dispatchers.Default)
-
-    init {
-        _scope.launch {
-            repeat(10) { index ->
-                createTask(Task(
-                    id = 0,
-                    title = "Task $index",
-                    isSuccess = false,
-                    date = Calendar.getInstance().time,
-                ))
-            }
-        }
-    }
-
     override suspend fun createTask(task: Task) {
        _tasks.add(task.copy(
            id = ++_id
@@ -34,7 +20,19 @@ class TaskRepoInMemory : ITaskRepo {
     }
 
     override suspend fun getTasks(date: Date): List<Task> {
-        return _tasks
+        if (_tasks.isEmpty()) {
+            repeat(10) { index ->
+                _tasks.add(Task(
+                    id = ++_id,
+                    title = "Task $index",
+                    isSuccess = false,
+                    date = Calendar.getInstance().time,
+                ))
+            }
+        }
+        return _tasks.filter {
+            DateUtils.compareByDay(it.date, date)
+        }
     }
 
     override suspend fun updateTask(task: Task): Boolean {
