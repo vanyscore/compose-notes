@@ -4,6 +4,11 @@ import java.util.Calendar
 import java.util.Date
 
 object DateUtils {
+
+    fun isCurrentDay(date: Date): Boolean {
+        val calendar = Calendar.getInstance()
+        return compareByDay(calendar.time, date)
+    }
     fun compareByDay(date1: Date, date2: Date): Boolean {
         val c1 = Calendar.getInstance().apply {
             time = date1

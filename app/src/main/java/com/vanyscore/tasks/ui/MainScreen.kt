@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
@@ -99,34 +101,53 @@ fun MainScreen(
             }
         }
     ) {
-        LazyColumn(
-            Modifier
-                .padding(it)
-                .fillMaxSize()
+        Column(
+            modifier = Modifier.padding(it)
         ) {
-            item {
-                DayPickerBar { date ->
-                    viewModel.changeDate(date)
-                }
+            DayPickerBar { date ->
+                viewModel.changeDate(date)
             }
-            items(tasks.size, key = { index ->
-                tasks[index].id
-            }) {index ->
-                val task = tasks[index]
-                TaskItem(
-                    task,
-                    onTaskChanged = { updated ->
-                        viewModel.taskStatusUpdated(updated)
-                    },
-                    onTaskEdit = { editTask ->
+            if (tasks.isNotEmpty()) {
+                TasksList(
+                    tasks = tasks,
+                    onTaskEdit = {editTask ->
                         dialogState.value = true
                         editTaskState.value = editTask
-                    },
-                    onTaskDelete = { deleteTask ->
-                        viewModel.deleteTask(deleteTask)
                     }
                 )
+            } else {
+                EmptyTasks()
             }
+        }
+    }
+}
+
+@Composable
+fun TasksList(
+    tasks: List<Task>,
+    onTaskEdit: (task: Task) -> Unit
+) {
+    val viewModel: MainViewModel = viewModel()
+    val state = rememberLazyListState()
+    return LazyColumn(
+        state = state,
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        items(tasks.size, key = { index ->
+            tasks[index].id
+        }) {index ->
+            val task = tasks[index]
+            TaskItem(
+                task,
+                onTaskChanged = { updated ->
+                    viewModel.taskStatusUpdated(updated)
+                },
+                onTaskEdit = onTaskEdit,
+                onTaskDelete = { deleteTask ->
+                    viewModel.deleteTask(deleteTask)
+                }
+            )
         }
     }
 }
@@ -168,12 +189,21 @@ fun DayPickerBar(
         }
         list
     }
+    var initialIndex = dates.indexOfFirst {
+        DateUtils.isCurrentDay(it)
+    }
+    if (initialIndex - 5 > 0) {
+        initialIndex -= 5
+    }
+    val rowState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
 
     val dateFormat = remember {
         SimpleDateFormat("E", Locale.getDefault())
     }
 
-    return LazyRow {
+    return LazyRow(
+        state = rowState
+    ) {
         items(dates.size) {
             val date = dates[it]
             val calendar = Calendar.getInstance()
@@ -211,6 +241,26 @@ fun DayPickerBar(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun EmptyTasks() {
+    return Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                Icons.Filled.List, "list",
+                modifier = Modifier.size(112.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Список задач пуст")
         }
     }
 }
