@@ -1,6 +1,5 @@
 package com.vanyscore.tasks.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.tasks.Services
@@ -62,11 +61,11 @@ class MainViewModel(
         }
     }
 
-    fun changeDate(date: Date) {
+    fun setDate(date: Date) {
+        _state.value = _state.value.copy(
+            date = date
+        )
         viewModelScope.launch {
-            _state.value = _state.value.copy(
-                date = date
-            )
             refresh()
         }
     }

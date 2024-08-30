@@ -41,21 +41,21 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastFirstOrNull
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.tasks.data.Task
 import com.vanyscore.tasks.utils.DateUtils
 import java.text.SimpleDateFormat
-import java.time.Instant
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -113,7 +113,7 @@ fun MainScreen(
             modifier = Modifier.padding(it)
         ) {
             DayPickerBar { date ->
-                viewModel.changeDate(date)
+                viewModel.setDate(date)
             }
             if (tasks.isNotEmpty()) {
                 TasksList(
@@ -198,7 +198,9 @@ fun MonthAndYearPickerBar() {
                 }
             }
             if (dialogState.value) {
-                val datePickerState = rememberDatePickerState()
+                val datePickerState = rememberDatePickerState(
+                    initialDisplayedMonthMillis = state.value.date.time,
+                )
                 DatePickerDialog(
                     onDismissRequest = {
                        dialogState.value = false
@@ -207,7 +209,7 @@ fun MonthAndYearPickerBar() {
                         val selectedDateInMillis = datePickerState.selectedDateMillis
                         if (selectedDateInMillis != null) {
                             dialogState.value = false
-                            viewModel.changeDate(Calendar.getInstance().apply {
+                            viewModel.setDate(Calendar.getInstance().apply {
                                 timeInMillis = selectedDateInMillis
                             }.time)
                         }
@@ -231,9 +233,13 @@ fun DayPickerBar(
     onDaySelected: (Date) -> Unit
 ) {
     val viewModel: MainViewModel = viewModel()
-    val state = viewModel.state.collectAsState()
-    val dates = remember {
+    val state = viewModel.state.collectAsState().value
+    val currentDate = state.date
+
+    fun getDayDates(): List<Date> {
         val calendar = Calendar.getInstance().apply {
+            timeInMillis = currentDate.time
+        }.apply {
             set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.HOUR, 0)
             set(Calendar.MINUTE, 0)
@@ -248,8 +254,10 @@ fun DayPickerBar(
             }
             list.add(dateToAdd)
         }
-        list
+        return list
     }
+    val dates = getDayDates()
+
     var initialIndex = dates.indexOfFirst {
         DateUtils.isCurrentDay(it)
     }
@@ -257,6 +265,17 @@ fun DayPickerBar(
         initialIndex -= 5
     }
     val rowState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
+    val lastDatePicked = remember {
+        mutableStateOf(state.date)
+    }
+    val selectedIndex = dates.indexOfFirst {
+        DateUtils.isDateEqualsByDay(state.date, it)
+    }
+    val scrollIndex = if (selectedIndex - 2 >= 0) selectedIndex - 2 else selectedIndex
+    LaunchedEffect(key1 = state.date) {
+        rowState.animateScrollToItem(scrollIndex)
+    }
+    lastDatePicked.value = state.date
 
     val dateFormat = remember {
         SimpleDateFormat("E", Locale.getDefault())
@@ -276,7 +295,7 @@ fun DayPickerBar(
                         onDaySelected(date)
                     }
                     .background(
-                        if (DateUtils.compareByDay(date, state.value.date))
+                        if (it == selectedIndex)
                             MaterialTheme.colorScheme.inversePrimary
                         else MaterialTheme.colorScheme.primary
                     )

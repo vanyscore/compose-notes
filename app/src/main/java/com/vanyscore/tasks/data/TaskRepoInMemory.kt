@@ -1,10 +1,6 @@
 package com.vanyscore.tasks.data
 
-import android.util.Log
 import com.vanyscore.tasks.utils.DateUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 
@@ -31,7 +27,7 @@ class TaskRepoInMemory : ITaskRepo {
             }
         }
         return _tasks.filter {
-            DateUtils.compareByDay(it.date, date)
+            DateUtils.isDateEqualsByDay(it.date, date)
         }
     }
 
