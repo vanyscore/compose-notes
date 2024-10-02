@@ -1,4 +1,4 @@
-package com.vanyscore.tasks.utils
+package com.vanyscore.app.utils
 
 import java.util.Calendar
 import java.util.Date

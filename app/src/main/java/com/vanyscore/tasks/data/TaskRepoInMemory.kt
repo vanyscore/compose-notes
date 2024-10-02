@@ -1,6 +1,6 @@
 package com.vanyscore.tasks.data
 
-import com.vanyscore.tasks.utils.DateUtils
+import com.vanyscore.app.utils.DateUtils
 import java.util.Calendar
 import java.util.Date
 

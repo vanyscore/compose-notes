@@ -1,4 +1,4 @@
-package com.vanyscore.tasks.ui
+package com.vanyscore.notes
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

@@ -1,4 +1,4 @@
-package com.vanyscore.tasks.data
+package com.vanyscore.notes.domain
 
 import java.util.Date
 

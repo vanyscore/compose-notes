@@ -1,4 +1,4 @@
-package com.vanyscore.tasks.ui
+package com.vanyscore.tasks.ui.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

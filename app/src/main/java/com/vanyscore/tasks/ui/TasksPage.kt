@@ -49,12 +49,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.tasks.data.Task
-import com.vanyscore.tasks.utils.DateUtils
+import com.vanyscore.tasks.ui.dialogs.EditTaskDialog
+import com.vanyscore.app.utils.DateUtils
+import com.vanyscore.tasks.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

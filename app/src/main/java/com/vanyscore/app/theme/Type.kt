@@ -1,4 +1,4 @@
-package com.vanyscore.tasks.ui.theme
+package com.vanyscore.app.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

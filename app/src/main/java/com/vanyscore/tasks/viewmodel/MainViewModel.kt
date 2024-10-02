@@ -1,8 +1,8 @@
-package com.vanyscore.tasks.ui
+package com.vanyscore.tasks.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vanyscore.tasks.Services
+import com.vanyscore.app.Services
 import com.vanyscore.tasks.data.ITaskRepo
 import com.vanyscore.tasks.data.Task
 import kotlinx.coroutines.flow.MutableStateFlow

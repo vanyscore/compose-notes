@@ -1,6 +1,7 @@
-package com.vanyscore.tasks.data
+package com.vanyscore.notes.data
 
-import com.vanyscore.tasks.utils.DateUtils
+import com.vanyscore.notes.domain.Note
+import com.vanyscore.app.utils.DateUtils
 import java.util.Calendar
 import java.util.Date
 
@@ -18,13 +19,15 @@ class NoteRepoInMemory : INoteRepo {
     override suspend fun getNotes(date: Date): List<Note> {
         if (_notes.isEmpty()) {
             repeat(10) { index ->
-                _notes.add(Note(
+                _notes.add(
+                    Note(
                     id = ++_id,
                     title = "Note $index",
                     description = "Som note",
                     created = Calendar.getInstance().time,
                     edited = Calendar.getInstance().time,
-                ))
+                )
+                )
             }
         }
         return _notes.filter {

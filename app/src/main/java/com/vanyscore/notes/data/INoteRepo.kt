@@ -1,5 +1,6 @@
-package com.vanyscore.tasks.data
+package com.vanyscore.notes.data
 
+import com.vanyscore.notes.domain.Note
 import java.util.Date
 
 interface INoteRepo {

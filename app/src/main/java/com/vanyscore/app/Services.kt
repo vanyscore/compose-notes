@@ -1,4 +1,4 @@
-package com.vanyscore.tasks
+package com.vanyscore.app
 
 import com.vanyscore.tasks.data.ITaskRepo
 import com.vanyscore.tasks.data.TaskRepoInMemory
