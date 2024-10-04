@@ -1,9 +1,11 @@
 package com.vanyscore.tasks.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.app.AppState
 import com.vanyscore.app.Services
+import com.vanyscore.app.utils.DateUtils
 import com.vanyscore.tasks.data.ITaskRepo
 import com.vanyscore.tasks.data.Task
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,20 +30,34 @@ class TaskViewModel(
             AppState.source.collect { appState ->
                 _state.update {
                     _state.value.copy(
-                        date = appState.date
+                        selectedDate = appState.date
                     )
                 }
                 refresh()
             }
-
         }
     }
 
     private fun refresh() {
         viewModelScope.launch {
-            val tasks = repository.getTasks(_state.value.date)
+            val state = _state.value
+            val calendar = Calendar.getInstance().apply {
+                time = state.selectedDate
+            }
+            val startDate = calendar.apply {
+                set(Calendar.DAY_OF_MONTH, 1)
+            }.time
+            val endDate = calendar.apply {
+                add(Calendar.MONTH, 1)
+                set(Calendar.DAY_OF_MONTH, -1)
+            }.time
+            val monthDates = DateUtils.getAllDaysFromMonth(state.selectedDate)
+            val monthTasks = repository.getTasks(startDate, endDate)
             _state.update {
-                state.value.copy(tasks = tasks)
+                state.copy(
+                    monthDates = monthDates,
+                    monthTasks = monthTasks
+                )
             }
         }
     }
@@ -78,6 +94,7 @@ class TaskViewModel(
 }
 
 data class MainViewState(
-    val date: Date = Calendar.getInstance().time,
-    val tasks: List<Task> = listOf()
+    val selectedDate: Date = Calendar.getInstance().time,
+    val monthDates: List<Date> = emptyList(),
+    val monthTasks: List<Task> = emptyList(),
 )

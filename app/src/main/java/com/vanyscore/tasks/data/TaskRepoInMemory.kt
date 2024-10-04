@@ -15,7 +15,7 @@ class TaskRepoInMemory : ITaskRepo {
        ))
     }
 
-    override suspend fun getTasks(date: Date): List<Task> {
+    private fun fillIfEmpty() {
         if (_tasks.isEmpty()) {
             repeat(10) { index ->
                 _tasks.add(Task(
@@ -26,8 +26,19 @@ class TaskRepoInMemory : ITaskRepo {
                 ))
             }
         }
+    }
+
+    override suspend fun getTasks(date: Date): List<Task> {
+        fillIfEmpty()
         return _tasks.filter {
             DateUtils.isDateEqualsByDay(it.date, date)
+        }
+    }
+
+    override suspend fun getTasks(startDate: Date, endDate: Date): List<Task> {
+        fillIfEmpty()
+        return _tasks.filter {
+            it.date.after(startDate) && it.date.before(endDate)
         }
     }
 

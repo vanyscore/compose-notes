@@ -3,7 +3,6 @@ package com.vanyscore.tasks.ui
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,17 +15,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,38 +31,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.app.AppState
+import com.vanyscore.app.ui.DayPickerBar
+import com.vanyscore.app.ui.DayStatus
+import com.vanyscore.app.utils.DateUtils
 import com.vanyscore.tasks.data.Task
 import com.vanyscore.tasks.ui.dialogs.EditTaskDialog
-import com.vanyscore.app.utils.DateUtils
 import com.vanyscore.tasks.viewmodel.TaskViewModel
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TasksPage() {
     val viewModel = viewModel<TaskViewModel>()
     val state = viewModel.state.collectAsState().value
-    val tasks = state.tasks
+    val tasks = state.monthTasks
 
     val dialogState = remember {
         mutableStateOf(false)
@@ -82,7 +69,7 @@ fun TasksPage() {
     if (dialogState.value) {
         val isEdit = editTaskState.value != null
         EditTaskDialog(
-            date = state.date,
+            date = state.selectedDate,
             task = editTaskState.value, onResult = { task ->
                 closeDialog()
                 if (!isEdit) {
@@ -108,14 +95,32 @@ fun TasksPage() {
         }
     ) {
         Column {
-            DayPickerBar { date ->
+            DayPickerBar(
+                state.monthDates,
+                state.selectedDate,
+                checkDayStatus = { day ->
+                    val dayTasks = state.monthTasks.filter {
+                        DateUtils.isDateEqualsByDay(it.date, day)
+                    }
+                    val isAllSuccess = dayTasks.all { t ->
+                        t.isSuccess
+                    }
+                    if (dayTasks.isEmpty()) DayStatus.EMPTY
+                    else {
+                        if (isAllSuccess) DayStatus.IS_SUCCESS
+                        else DayStatus.HAS_TASKS
+                    }
+                }
+            ) { date ->
                 AppState.updateState(AppState.source.value.copy(
                     date = date
                 ))
             }
             if (tasks.isNotEmpty()) {
                 TasksList(
-                    tasks = tasks,
+                    tasks = tasks.filter {
+                        DateUtils.isDateEqualsByDay(it.date, state.selectedDate)
+                    },
                     onTaskEdit = {editTask ->
                         dialogState.value = true
                         editTaskState.value = editTask
@@ -158,105 +163,7 @@ fun TasksList(
     }
 }
 
-@Composable
-fun DayPickerBar(
-    onDaySelected: (Date) -> Unit
-) {
-    val viewModel: TaskViewModel = viewModel()
-    val state = viewModel.state.collectAsState().value
-    val currentDate = state.date
 
-    fun getDayDates(): List<Date> {
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = currentDate.time
-        }.apply {
-            set(Calendar.DAY_OF_MONTH, 1)
-            set(Calendar.HOUR, 0)
-            set(Calendar.MINUTE, 0)
-        }
-        val startDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH)
-        val endDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val list = mutableListOf<Date>()
-        startDay.until(endDay + 1).map { day ->
-            val dateToAdd = calendar.let {
-                it.set(Calendar.DAY_OF_MONTH, day)
-                it.time.clone() as Date
-            }
-            list.add(dateToAdd)
-        }
-        return list
-    }
-    val dates = getDayDates()
-
-    var initialIndex = dates.indexOfFirst {
-        DateUtils.isCurrentDay(it)
-    }
-    if (initialIndex - 5 > 0) {
-        initialIndex -= 5
-    }
-    if (initialIndex == -1) {
-        initialIndex = 0
-    }
-    val rowState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
-    val lastDatePicked = remember {
-        mutableStateOf(state.date)
-    }
-    val selectedIndex = dates.indexOfFirst {
-        DateUtils.isDateEqualsByDay(state.date, it)
-    }
-    val scrollIndex = if (selectedIndex - 2 >= 0) selectedIndex - 2 else selectedIndex
-    LaunchedEffect(key1 = state.date) {
-        rowState.animateScrollToItem(scrollIndex)
-    }
-    lastDatePicked.value = state.date
-
-    val dateFormat = remember {
-        SimpleDateFormat("E", Locale.getDefault())
-    }
-
-    return LazyRow(
-        state = rowState
-    ) {
-        items(dates.size) {
-            val date = dates[it]
-            val calendar = Calendar.getInstance()
-            calendar.time = date
-
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        onDaySelected(date)
-                    }
-                    .background(
-                        if (it == selectedIndex)
-                            MaterialTheme.colorScheme.inversePrimary
-                        else MaterialTheme.colorScheme.primary
-                    )
-                    .size(52.dp)
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(
-                        calendar.get(Calendar.DAY_OF_MONTH).toString(),
-                        style = TextStyle(
-                            color = Color.White
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        dateFormat.format(date),
-                        style = TextStyle(
-                            color = Color.White
-                        )
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun EmptyTasks() {
