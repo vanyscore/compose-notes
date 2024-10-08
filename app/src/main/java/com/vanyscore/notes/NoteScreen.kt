@@ -13,29 +13,29 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.vanyscore.notes.domain.Note
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vanyscore.notes.viewmodel.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun NoteScreen(
-    noteId: Int?
+    noteId: Int?,
 ) {
-    val titleState = rememberSaveable(
-        stateSaver = TextFieldValue.Saver,
-    ) {
-        mutableStateOf(TextFieldValue(""))
+    val viewModel = viewModel<NoteViewModel>().apply {
+        if (noteId != null) {
+            applyNoteId(noteId)
+        }
     }
-    val descriptionState = rememberSaveable(
-        stateSaver = TextFieldValue.Saver
-    ) {
-        mutableStateOf(TextFieldValue(""))
-    }
+    val state = viewModel.state.collectAsState()
+    val note = state.value
     return Scaffold(
         topBar = {
             TopAppBar(
@@ -60,26 +60,34 @@ fun NoteScreen(
                 modifier = Modifier.height(16.dp)
             )
             TextField(
-                titleState.value,
+                note.title,
                 modifier = Modifier.fillMaxWidth(),
                 label = {
                     Text("Заголовок")
                 },
-                onValueChange = {
-
+                onValueChange = { value ->
+                    viewModel.updateNote(
+                        note.copy(
+                            title = value
+                        )
+                    )
                 },
             )
             Spacer(
                 modifier = Modifier.height(8.dp)
             )
             TextField(
-                descriptionState.value,
+                note.description,
                 modifier = Modifier.fillMaxWidth(),
                 label = {
                     Text("Описание")
                 },
-                onValueChange = {
-
+                onValueChange = { value ->
+                    viewModel.updateNote(
+                        note.copy(
+                            description = value
+                        )
+                    )
                 }
             )
         }

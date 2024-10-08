@@ -2,15 +2,19 @@ package com.vanyscore.app.navigation
 
 object AppRoutes {
     const val MAIN = "main"
-    const val NOTE = "note"
+    const val NOTE = "note?id={${AppRouteArgs.NOTE_ID}}"
 }
 
-object AppRouteSchemes {
-    fun note(noteId: Int? = null): String {
-        return if (noteId == null) {
-            AppRoutes.NOTE
-        } else {
-            AppRoutes.NOTE + "?noteId=$noteId"
+object AppRouteArgs {
+    const val NOTE_ID = "noteId"
+}
+
+object AppRoutSchemes {
+    fun note(id: Int? = null): String {
+        var path = AppRoutes.NOTE
+        if (id != null) {
+            path = path.replace("{${AppRouteArgs.NOTE_ID}}", id.toString())
         }
+        return path
     }
 }

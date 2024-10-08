@@ -1,15 +1,15 @@
 package com.vanyscore.app.navigation
 
-import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.vanyscore.app.MainScreen
 import com.vanyscore.notes.NoteScreen
 import com.vanyscore.notes.domain.Note
-import java.net.URI
 
 @Composable
 fun App() {
@@ -21,12 +21,21 @@ fun App() {
         composable(AppRoutes.MAIN) {
             MainScreen(
                 openNote = { note: Note? ->
-                    navController.navigate(AppRouteSchemes.note(note?.id))
+                    navController.openNote(note)
                 }
             )
         }
-        composable(AppRoutes.NOTE) {
-            NoteScreen(null)
+        composable(AppRoutes.NOTE, listOf(
+            navArgument(AppRouteArgs.NOTE_ID) {
+                type = NavType.IntType
+            }
+        )) {
+            val noteId = it.arguments?.getInt(AppRouteArgs.NOTE_ID)
+            NoteScreen(noteId)
         }
     }
+}
+
+fun NavController.openNote(note: Note?) {
+    navigate(AppRoutSchemes.note(note?.id))
 }
