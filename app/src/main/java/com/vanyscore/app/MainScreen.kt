@@ -23,7 +23,7 @@ import com.vanyscore.tasks.ui.TasksPage
 
 @Composable
 fun MainScreen(
-    openNote: (Note) -> Unit
+    openNote: (Note?) -> Unit
 ) {
     val selectedTab = remember {
         mutableIntStateOf(0)

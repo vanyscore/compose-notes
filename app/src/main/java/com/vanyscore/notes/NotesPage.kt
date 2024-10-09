@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,11 +26,24 @@ import com.vanyscore.notes.viewmodel.NotesViewModel
 @Composable
 fun NotesPage(
     viewModel: NotesViewModel = viewModel(),
-    openNote: (Note) -> Unit
+    openNote: (Note?) -> Unit
 ) {
     val state = viewModel.state.collectAsState().value
     val notes = state.notes
-    return Scaffold {
+    return Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    openNote(null)
+                }
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    "add_note"
+                )
+            }
+        }
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),

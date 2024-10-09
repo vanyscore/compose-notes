@@ -30,10 +30,11 @@ fun App() {
         composable(AppRoutes.NOTE, listOf(
             navArgument(AppRouteArgs.NOTE_ID) {
                 type = NavType.IntType
+                defaultValue = -1
             }
         )) {
             val noteId = it.arguments?.getInt(AppRouteArgs.NOTE_ID)
-            NoteScreen(noteId)
+            NoteScreen(if (noteId == -1) null else noteId)
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.vanyscore.notes
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,8 +19,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.app.AppState
@@ -32,13 +36,20 @@ fun NoteScreen(
 ) {
     val appState = AppState.source.collectAsState()
     val navController = appState.value.navController
+    val isViewModelInit = remember {
+        mutableStateOf(false)
+    }
     val viewModel = viewModel<NoteViewModel>().apply {
-        if (noteId != null) {
+        if (!isViewModelInit.value && noteId != null) {
             applyNoteId(noteId)
+            isViewModelInit.value = true
         }
     }
     val state = viewModel.state.collectAsState()
-    val note = state.value
+    val note = state.value.note
+    if (state.value.canClose) {
+        navController?.navigateUp()
+    }
     return Scaffold(
         topBar = {
             TopAppBar(
@@ -55,6 +66,23 @@ fun NoteScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = Color.White
+            ) {
+                Button(
+                    modifier = Modifier
+                        .height(52.dp)
+                        .fillMaxWidth(),
+                    onClick = {
+                        viewModel.saveNote()
+                    },
+                    enabled = note.title.isNotEmpty() && note.description.isNotEmpty()
+                ) {
+                    Text("Сохранить")
+                }
+            }
         }
     ) { padding ->
         Column(
