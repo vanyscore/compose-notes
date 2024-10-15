@@ -1,10 +1,8 @@
 package com.vanyscore.notes.data
 
-import com.vanyscore.app.AppState
-import com.vanyscore.app.domain.Event
 import com.vanyscore.app.domain.EventBus
-import com.vanyscore.notes.domain.Note
 import com.vanyscore.app.utils.DateUtils
+import com.vanyscore.notes.domain.Note
 import java.util.Calendar
 import java.util.Date
 
@@ -50,7 +48,7 @@ class NoteRepoInMemory : INoteRepo {
             }
         }
         return _notes.filter {
-            DateUtils.isDateEqualsByDay(it.edited, date)
+            DateUtils.isDateEqualsByDay(it.created, date)
         }
     }
 
@@ -65,13 +63,9 @@ class NoteRepoInMemory : INoteRepo {
             it.id == note.id
         }
         val index = _notes.indexOf(found)
-        val updated = found?.copy(
-            title = note.title,
-            description = note.description,
-        )
-        if (updated == null) return false
+        if (index == -1) return false
         _notes.removeAt(index)
-        _notes.add(index, updated)
+        _notes.add(index, note)
         EventBus.triggerNotesUpdated()
         return true
     }

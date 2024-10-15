@@ -55,6 +55,9 @@ fun TasksPage() {
     val viewModel = viewModel<TaskViewModel>()
     val state = viewModel.state.collectAsState().value
     val tasks = state.monthTasks
+    val currentDayTasks = tasks.filter {
+        DateUtils.isDateEqualsByDay(it.date, state.selectedDate)
+    }
 
     val dialogState = remember {
         mutableStateOf(false)
@@ -116,11 +119,9 @@ fun TasksPage() {
                     date = date
                 ))
             }
-            if (tasks.isNotEmpty()) {
+            if (currentDayTasks.isNotEmpty()) {
                 TasksList(
-                    tasks = tasks.filter {
-                        DateUtils.isDateEqualsByDay(it.date, state.selectedDate)
-                    },
+                    tasks = currentDayTasks,
                     onTaskEdit = {editTask ->
                         dialogState.value = true
                         editTaskState.value = editTask

@@ -76,7 +76,8 @@ fun NoteScreen(
                         .height(52.dp)
                         .fillMaxWidth(),
                     onClick = {
-                        viewModel.saveNote()
+                        val appDate = appState.value.date
+                        viewModel.saveNote(appDate)
                     },
                     enabled = note.title.isNotEmpty() && note.description.isNotEmpty()
                 ) {

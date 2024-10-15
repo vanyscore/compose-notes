@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Date
 
 data class NoteState(
     val note: Note,
@@ -30,7 +32,6 @@ class NoteViewModel(
 
     fun applyNoteId(noteId: Int) {
         this.noteId = noteId
-        Log.d("note", "applyNoteId")
 
         viewModelScope.launch {
             val note = repo.getNote(noteId) ?: return@launch
@@ -52,13 +53,19 @@ class NoteViewModel(
         }
     }
 
-    fun saveNote() {
+    fun saveNote(forDate: Date) {
         viewModelScope.launch {
             val note = _state.value.note
+            val currentDate = Calendar.getInstance().time
             if (note.id == null) {
-                repo.createNote(note)
+                repo.createNote(note.copy(
+                    created = forDate,
+                    edited = forDate
+                ))
             } else {
-                repo.updateNote(note)
+                repo.updateNote(note.copy(
+                    edited = currentDate
+                ))
             }
             _state.update {
                 it.copy(

@@ -47,14 +47,9 @@ class TaskRepoInMemory : ITaskRepo {
             it.id == task.id
         }
         val index = _tasks.indexOf(found)
-        val updated = found?.copy(
-            title = task.title,
-            isSuccess = task.isSuccess,
-            date = task.date,
-        )
-        if (updated == null) return false
+        if (index == -1) return false
         _tasks.removeAt(index)
-        _tasks.add(index, updated)
+        _tasks.add(index, task)
         return true
     }
 

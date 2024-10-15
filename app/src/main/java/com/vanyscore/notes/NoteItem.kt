@@ -23,7 +23,7 @@ fun NoteItem(
     note: Note,
     onClick: () -> Unit,
 ) {
-    val formatter = remember { SimpleDateFormat("dd:MM:yyyy", Locale.getDefault()) }
+    val formatter = remember { SimpleDateFormat("dd:MM:yyyy HH:mm", Locale.getDefault()) }
     return Card(
         onClick = onClick,
         modifier = Modifier.fillMaxSize()
