@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -24,10 +25,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.app.AppState
 import com.vanyscore.notes.viewmodel.NoteViewModel
+import com.vanyscore.tasks.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +67,11 @@ fun NoteScreen(
                         }) {
                             Icon(Icons.Default.ArrowBack, "back")
                         }
+                    }
+                },
+                actions = {
+                    if (note.id != null) {
+                        RemoveNoteButton()
                     }
                 }
             )
@@ -132,5 +141,23 @@ fun NoteScreen(
                 }
             )
         }
+    }
+}
+
+@Composable
+fun RemoveNoteButton() {
+    val viewModel = viewModel<NoteViewModel>()
+    val state = viewModel.state.collectAsState().value
+    val note = state.note
+    IconButton(
+        onClick = {
+            viewModel.removeNote(note)
+        }
+    ) {
+        Icon(
+            ImageVector.vectorResource(R.drawable.ic_tash),
+            "remove",
+            tint = MaterialTheme.colorScheme.primary
+        )
     }
 }

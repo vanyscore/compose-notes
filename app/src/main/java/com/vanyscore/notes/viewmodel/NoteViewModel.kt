@@ -74,4 +74,17 @@ class NoteViewModel(
             }
         }
     }
+
+    fun removeNote(note: Note) {
+        if (note.id != null) {
+            viewModelScope.launch {
+                repo.deleteNote(note)
+                _state.update {
+                    it.copy(
+                        canClose = true
+                    )
+                }
+            }
+        }
+    }
 }

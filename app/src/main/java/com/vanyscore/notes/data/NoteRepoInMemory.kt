@@ -75,6 +75,7 @@ class NoteRepoInMemory : INoteRepo {
         if (found == null) return false
         val index = _notes.indexOf(found)
         _notes.removeAt(index)
+        EventBus.triggerNotesUpdated()
         return true
     }
 }

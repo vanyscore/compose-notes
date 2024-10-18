@@ -100,7 +100,7 @@ fun NotesEmpty() {
             )
             Spacer(Modifier.height(16.dp))
             Text(
-                "Список заметок указанную дату пуст",
+                "Список заметок пуст",
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
