@@ -1,11 +1,13 @@
 package com.vanyscore.notes
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
@@ -31,6 +33,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.app.AppState
+import com.vanyscore.app.ui.AttachmentsControl
 import com.vanyscore.notes.viewmodel.NoteViewModel
 import com.vanyscore.tasks.R
 
@@ -96,9 +99,9 @@ fun NoteScreen(
             }
         }
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(
                     top = padding.calculateTopPadding(),
                     start = 16.dp,
@@ -107,40 +110,67 @@ fun NoteScreen(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(
-                modifier = Modifier.height(16.dp)
-            )
-            TextField(
-                note.title,
-                modifier = Modifier.fillMaxWidth(),
-                label = {
-                    Text(stringResource(R.string.title))
-                },
-                onValueChange = { value ->
-                    viewModel.updateNote(
-                        note.copy(
-                            title = value
+            item {
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
+            }
+            item {
+                TextField(
+                    note.title,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text(stringResource(R.string.title))
+                    },
+                    onValueChange = { value ->
+                        viewModel.updateNote(
+                            note.copy(
+                                title = value
+                            )
                         )
-                    )
-                },
-            )
-            Spacer(
-                modifier = Modifier.height(8.dp)
-            )
-            TextField(
-                note.description,
-                modifier = Modifier.fillMaxWidth(),
-                label = {
-                    Text(stringResource(R.string.description))
-                },
-                onValueChange = { value ->
-                    viewModel.updateNote(
-                        note.copy(
-                            description = value
+                    },
+                )
+            }
+            item {
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
+            }
+            item {
+                TextField(
+                    note.description,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text(stringResource(R.string.description))
+                    },
+                    onValueChange = { value ->
+                        viewModel.updateNote(
+                            note.copy(
+                                description = value
+                            )
                         )
+                    }
+                )
+            }
+            item {
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
+            }
+            item {
+                AttachmentsControl(
+                    attachments = listOf(
+                        Uri.parse("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpmYrXnE51Hn7cTHaoJfbIZwZMF8chYRnB6A&s"),
+                        Uri.parse("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpmYrXnE51Hn7cTHaoJfbIZwZMF8chYRnB6A&s"),
+                        Uri.parse("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpmYrXnE51Hn7cTHaoJfbIZwZMF8chYRnB6A&s"),
+                        Uri.parse("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpmYrXnE51Hn7cTHaoJfbIZwZMF8chYRnB6A&s"),
+                        Uri.parse("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpmYrXnE51Hn7cTHaoJfbIZwZMF8chYRnB6A&s"),
+                        Uri.parse("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpmYrXnE51Hn7cTHaoJfbIZwZMF8chYRnB6A&s"),
+                        Uri.parse("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpmYrXnE51Hn7cTHaoJfbIZwZMF8chYRnB6A&s"),
+                        Uri.parse("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpmYrXnE51Hn7cTHaoJfbIZwZMF8chYRnB6A&s"),
                     )
-                }
-            )
+                )
+            }
         }
     }
 }
@@ -156,7 +186,7 @@ fun RemoveNoteButton() {
         }
     ) {
         Icon(
-            ImageVector.vectorResource(R.drawable.ic_tash),
+            ImageVector.vectorResource(R.drawable.ic_trash),
             "remove",
             tint = MaterialTheme.colorScheme.primary
         )
