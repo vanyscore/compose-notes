@@ -1,25 +1,20 @@
 package com.vanyscore.notes.viewmodel
 
-import android.content.Context
 import android.net.Uri
-import android.util.Log
+import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.app.Services
-import com.vanyscore.app.utils.FileUtil
-import com.vanyscore.app.utils.Logger
 import com.vanyscore.notes.data.INoteRepo
 import com.vanyscore.notes.domain.Note
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.internal.SynchronizedObject
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
-import java.util.UUID
 
 data class NoteState(
     val note: Note,
@@ -50,7 +45,7 @@ class NoteViewModel(
     }
 
 
-    fun applyNoteId(noteId: Int) {
+    fun attachNoteId(noteId: Int) {
         this.noteId = noteId
 
         refresh()
@@ -66,19 +61,12 @@ class NoteViewModel(
         }
     }
 
-    fun attachAttachment(context: Context, uri: Uri, note: Note) {
+    fun attachAttachment(uri: Uri, note: Note) {
         viewModelScope.launch {
-            // TODO: Move action to repository.
-            val attachmentUUID = UUID.randomUUID()
-            val attachmentFileExtension = FileUtil.getFileExtensionFromUri(context, uri)
-            val fileName = "${attachmentUUID}.$attachmentFileExtension"
-            // TODO: Save image to temporary storage and move it to another folder on save.
-            val savedFileUri = FileUtil.saveFileToInternalStorage(context, uri, fileName) ?: return@launch
-            updateNote(note.copy(
-                images = note.images.toMutableList().apply {
-                    add(savedFileUri)
-                }
-            ))
+            val updatedNote = repo.attachImage(note, uri)
+            if (updatedNote != null) {
+                updateNote(updatedNote)
+            }
         }
     }
 
@@ -88,7 +76,9 @@ class NoteViewModel(
             val note = state.note
             val images = note.images
             val updatedImages = images.toMutableList().apply {
-                remove(uri)
+                removeIf {
+                    it.uri == uri
+                }
             }
             _state.update {
                 state.copy(
@@ -125,6 +115,11 @@ class NoteViewModel(
     fun removeNote(note: Note) {
         if (note.id != null) {
             viewModelScope.launch {
+                note.images.forEach {
+                    withContext(Dispatchers.IO) {
+                        it.uri.toFile().delete()
+                    }
+                }
                 repo.deleteNote(note)
                 _state.update {
                     it.copy(

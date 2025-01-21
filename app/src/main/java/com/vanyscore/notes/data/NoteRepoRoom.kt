@@ -1,24 +1,49 @@
 package com.vanyscore.notes.data
 
+import android.content.ContentResolver
+import android.net.Uri
+import androidx.core.net.toFile
 import androidx.core.net.toUri
+import com.vanyscore.app.Services
 import com.vanyscore.app.domain.EventBus
 import com.vanyscore.app.utils.DateUtils
 import com.vanyscore.app.utils.FileUtil
+import com.vanyscore.app.utils.Logger
 import com.vanyscore.notes.domain.Note
+import com.vanyscore.notes.domain.NoteImage
+import com.vanyscore.notes.domain.moveIfItTemporary
+import java.io.File
 import java.util.Date
+import java.util.UUID
 
 class NoteRepoRoom(
-    private val dao: NotesDao
+    private val dao: NotesDao,
+    private val contentResolver: ContentResolver = Services.contentResolver,
+    private val outputImagesDir: File = Services.noteImagesDir,
+    private val cacheDir: File = Services.cacheDir,
 ) : INoteRepo {
 
     override suspend fun createNote(note: Note) {
         val noteId = dao.createNote(note.toRoom()).toInt()
-        note.images.forEach {
-            // TODO: Save uri file to local storage.
-            val path = it.toString()
-            dao.createImage(NoteImage(null, noteId, path))
+        note.images.moveIfItTemporary(outputImagesDir).forEach {
+            val path = it.uri.toString()
+            dao.createImage(NoteImageRoom(null, noteId, path))
         }
         EventBus.triggerNotesUpdated()
+    }
+
+    override suspend fun attachImage(note: Note, uri: Uri): Note? {
+        val attachmentUUID = UUID.randomUUID()
+        val attachmentFileExtension = FileUtil.getFileExtensionFromUri(contentResolver, uri)
+        val fileName = "${attachmentUUID}.$attachmentFileExtension"
+        // Save image in cache dir.
+        val savedFileUri = FileUtil
+            .saveFileToInternalStorage(contentResolver, uri, fileName, dir = cacheDir) ?: return null
+        return note.copy(
+            images = note.images.toMutableList().apply {
+                add(NoteImage(savedFileUri, isTemporary = true))
+            }
+        )
     }
 
     override suspend fun getNotes(fromDate: Date, toDate: Date): List<Note> {
@@ -30,6 +55,9 @@ class NoteRepoRoom(
 
     override suspend fun getNote(id: Int): Note? {
         val note = dao.getNote(id).withImages(dao).firstOrNull()
+        note?.images?.forEach {
+            Logger.log("Image path: ${it.uri.toFile().path}")
+        }
         return note
     }
 
@@ -37,27 +65,28 @@ class NoteRepoRoom(
         if (note.id == null) return false
         val oldNote = getNote(note.id) ?: return false
         val oldImages = oldNote.images
-        val newImages = note.images
-        if (newImages.size > oldImages.size) {
-            val newPaths = mutableListOf<String>()
-            newImages.forEach {
+        val actualImages = note.images
+        if (actualImages.size > oldImages.size) {
+            val newImages = mutableListOf<NoteImage>()
+            actualImages.forEach {
                 if (!oldImages.contains(it)) {
-                    newPaths.add(it.toString())
+                    newImages.add(it)
                 }
             }
-            newPaths.forEach { path ->
-                dao.createImage(NoteImage(null, note.id, path))
+            newImages.moveIfItTemporary(outputImagesDir).forEach {
+                val uriPath = it.uri.toString()
+                dao.createImage(NoteImageRoom(null, note.id, uriPath))
             }
 
-        } else if (newImages.size < oldImages.size) {
-            val pathsForRemove = mutableListOf<String>()
+        } else if (actualImages.size < oldImages.size) {
+            val noteImagesToRemove = mutableListOf<NoteImage>()
             oldImages.forEach {
-                if (!newImages.contains(it)) {
-                    pathsForRemove.add(it.toString())
+                if (!actualImages.contains(it)) {
+                    noteImagesToRemove.add(it)
                 }
             }
-            pathsForRemove.mapNotNull {
-                dao.getImageByPath(it).firstOrNull()
+            noteImagesToRemove.mapNotNull {
+                dao.getImageByPath(it.uri.toString()).firstOrNull()
             }.forEach {
                 FileUtil.removeFileByUri(it.path.toUri())
                 dao.deleteImage(it)

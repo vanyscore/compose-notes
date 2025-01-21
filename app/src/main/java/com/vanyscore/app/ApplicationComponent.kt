@@ -6,6 +6,7 @@ class ApplicationComponent : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Services.bindContext(applicationContext)
+        Services.bindApplicationContext(this)
+        Services.build()
     }
 }

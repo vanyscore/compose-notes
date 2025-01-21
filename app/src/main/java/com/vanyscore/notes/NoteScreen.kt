@@ -1,10 +1,6 @@
 package com.vanyscore.notes
 
-import android.net.Uri
-import android.util.Log
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,14 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.app.AppState
 import com.vanyscore.app.ui.AttachmentsControl
-import com.vanyscore.app.utils.Logger
 import com.vanyscore.notes.viewmodel.NoteViewModel
 import com.vanyscore.tasks.R
 
@@ -50,10 +44,9 @@ fun NoteScreen(
     val isViewModelInit = remember {
         mutableStateOf(false)
     }
-    val context = LocalContext.current
     val viewModel = viewModel<NoteViewModel>().apply {
         if (!isViewModelInit.value && noteId != null) {
-            applyNoteId(noteId)
+            attachNoteId(noteId)
             isViewModelInit.value = true
         }
     }
@@ -163,10 +156,11 @@ fun NoteScreen(
             }
             item {
                 AttachmentsControl(
-                    attachments = note.images,
+                    attachments = note.images.map {
+                        it.uri
+                    },
                     onAttachmentAdd = { uri ->
                         viewModel.attachAttachment(
-                            context = context,
                             uri = uri,
                             note = note,
                         )

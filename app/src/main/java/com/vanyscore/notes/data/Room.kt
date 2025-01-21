@@ -11,6 +11,7 @@ import androidx.room.TypeConverters
 import androidx.room.Update
 import com.vanyscore.app.room.converters.DateConverter
 import com.vanyscore.notes.domain.Note
+import com.vanyscore.notes.domain.NoteImage
 import java.util.Date
 
 @Entity(tableName = "notes")
@@ -32,7 +33,9 @@ fun NoteRoom.toDomain(images: List<Uri> = emptyList()): Note {
         description = description,
         created = created,
         edited = edited,
-        images = images
+        images = images.map {
+            NoteImage(it, isTemporary = false)
+        }
     )
 }
 
@@ -47,7 +50,7 @@ fun Note.toRoom(): NoteRoom {
 }
 
 @Entity(tableName = "note_images")
-data class NoteImage(
+data class NoteImageRoom(
     @PrimaryKey(autoGenerate = true)
     val id: Int? = null,
     val noteId: Int,
@@ -67,13 +70,13 @@ interface NotesDao {
     @Delete
     suspend fun deleteNote(note: NoteRoom)
     @Insert
-    suspend fun createImage(noteImage: NoteImage)
+    suspend fun createImage(noteImage: NoteImageRoom)
     @Query("SELECT * FROM note_images WHERE noteId = (:noteId)")
-    suspend fun getImagesByNote(noteId: Int): List<NoteImage>
+    suspend fun getImagesByNote(noteId: Int): List<NoteImageRoom>
     @Query("SELECT * FROM note_images WHERE path = (:path)")
-    suspend fun getImageByPath(path: String): List<NoteImage>
+    suspend fun getImageByPath(path: String): List<NoteImageRoom>
     @Delete
-    suspend fun deleteImage(noteImage: NoteImage)
+    suspend fun deleteImage(noteImage: NoteImageRoom)
 }
 
 suspend fun List<NoteRoom>.withImages(dao: NotesDao): List<Note> {

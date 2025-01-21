@@ -1,7 +1,6 @@
 package com.vanyscore.app.utils
 
 import android.content.ContentResolver
-import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.core.net.toFile
@@ -15,20 +14,22 @@ import java.io.InputStream
 import java.io.OutputStream
 
 object FileUtil {
-    suspend fun saveFileToInternalStorage(context: Context, uri: Uri, fileName: String): Uri? {
+    suspend fun saveFileToInternalStorage(
+        contentResolver: ContentResolver,
+        uri: Uri,
+        fileName: String,
+        dir: File
+    ): Uri? {
         return withContext(Dispatchers.IO) {
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
 
             try {
-                // Get the content resolver to open the input stream
-                val contentResolver: ContentResolver = context.contentResolver
-
                 // Open the input stream from the URI
                 inputStream = contentResolver.openInputStream(uri)
 
                 // Create the output file in the internal storage directory
-                val internalFile = File(context.filesDir, fileName)
+                val internalFile = File(dir, fileName)
 
                 // Create an output stream to the internal file
                 outputStream = FileOutputStream(internalFile)
@@ -60,6 +61,21 @@ object FileUtil {
         }
     }
 
+    suspend fun copyFileByUri(uri: Uri, dir: File): Uri? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val file = uri.toFile()
+                val newFile = File(dir, file.name)
+                file.copyRecursively(newFile, overwrite = true)
+                file.delete()
+                newFile.toUri()
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                null
+            }
+        }
+    }
+
     suspend fun removeFileByUri(uri: Uri) {
         withContext(Dispatchers.IO) {
             try {
@@ -73,9 +89,9 @@ object FileUtil {
         }
     }
 
-    fun getFileExtensionFromUri(context: Context, uri: Uri): String? {
+    fun getFileExtensionFromUri(contentResolver: ContentResolver, uri: Uri): String? {
         // Get MIME type from the content resolver
-        val mimeType = context.contentResolver.getType(uri)
+        val mimeType = contentResolver.getType(uri)
 
         // Use MimeTypeMap to get the file extension based on the MIME type
         return mimeType?.let {

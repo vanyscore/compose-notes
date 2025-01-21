@@ -1,6 +1,5 @@
 package com.vanyscore.tasks.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.app.AppState

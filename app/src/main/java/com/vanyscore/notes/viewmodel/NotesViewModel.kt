@@ -1,6 +1,5 @@
 package com.vanyscore.notes.viewmodel
 
-import android.provider.CalendarContract.CalendarEntity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.app.AppState

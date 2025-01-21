@@ -1,11 +1,13 @@
 package com.vanyscore.notes.data
 
+import android.net.Uri
 import com.vanyscore.app.domain.EventBus
 import com.vanyscore.app.utils.DateUtils
 import com.vanyscore.notes.domain.Note
 import java.util.Calendar
 import java.util.Date
 
+// TODO: Implement.
 class NoteRepoInMemory : INoteRepo {
 
     private var _id = 0
@@ -31,6 +33,10 @@ class NoteRepoInMemory : INoteRepo {
             id = ++_id
         ))
         EventBus.triggerNotesUpdated()
+    }
+
+    override suspend fun attachImage(note: Note, uri: Uri): Note? {
+        TODO("Not yet implemented")
     }
 
     override suspend fun getNotes(fromDate: Date, toDate: Date): List<Note> {
