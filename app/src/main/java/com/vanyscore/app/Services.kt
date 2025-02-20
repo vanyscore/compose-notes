@@ -11,7 +11,6 @@ import com.vanyscore.tasks.data.ITaskRepo
 import com.vanyscore.tasks.data.TaskRepoRoom
 import java.io.File
 
-// TODO: Move to DI(hilt).
 object Services {
     val tasksRepo: ITaskRepo by lazy {
         TaskRepoRoom(
@@ -19,14 +18,13 @@ object Services {
         )
     }
     val notesRepo: INoteRepo by lazy {
-        NoteRepoRoom(database.notesDao())
+        NoteRepoRoom(database.notesDao(), contentResolver, noteImagesDir, cacheDir)
     }
 
     private lateinit var applicationContext: Context
-    lateinit var cacheDir: File
-    lateinit var filesDir: File
-    lateinit var noteImagesDir: File
-    lateinit var contentResolver: ContentResolver
+    private lateinit var cacheDir: File
+    private lateinit var noteImagesDir: File
+    private lateinit var contentResolver: ContentResolver
 
 
     private lateinit var database: AppDatabase
@@ -36,16 +34,11 @@ object Services {
     }
 
     fun build() {
-//        database = Room.inMemoryDatabaseBuilder(
-//            context = appContext,
-//            AppDatabase::class.java,
-//        ).build()
         database = Room.databaseBuilder(
             context = applicationContext,
             AppDatabase::class.java, "tn_database"
         ).build()
         cacheDir = applicationContext.cacheDir
-        filesDir = applicationContext.filesDir
         noteImagesDir = File(applicationContext.filesDir, "/note_images/")
         contentResolver = applicationContext.contentResolver
 

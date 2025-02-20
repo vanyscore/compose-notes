@@ -3,25 +3,27 @@ package com.vanyscore.notes.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.app.AppState
-import com.vanyscore.app.Services
 import com.vanyscore.app.domain.Event
 import com.vanyscore.app.domain.EventBus
 import com.vanyscore.notes.data.INoteRepo
 import com.vanyscore.notes.domain.Note
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
+import javax.inject.Inject
 
 data class NotesState(
     val notes: List<Note> = emptyList(),
     val isLoading: Boolean = false,
 )
 
-class NotesViewModel(
-    private val repo: INoteRepo = Services.notesRepo
+@HiltViewModel
+class NotesViewModel @Inject constructor(
+    private val repo: INoteRepo
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NotesState())

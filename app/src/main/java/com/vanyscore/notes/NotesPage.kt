@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.notes.domain.Note
 import com.vanyscore.notes.viewmodel.NotesViewModel
@@ -31,7 +32,7 @@ import com.vanyscore.notes.viewmodel.NotesViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NotesPage(
-    viewModel: NotesViewModel = viewModel(),
+    viewModel: NotesViewModel = hiltViewModel(),
     openNote: (Note?) -> Unit
 ) {
     val state = viewModel.state.collectAsState().value

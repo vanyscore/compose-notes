@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.app.AppState
 import com.vanyscore.app.ui.DayPickerBar
@@ -54,7 +55,7 @@ import com.vanyscore.tasks.viewmodel.TaskViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TasksPage() {
-    val viewModel = viewModel<TaskViewModel>()
+    val viewModel = hiltViewModel<TaskViewModel>()
     val state = viewModel.state.collectAsState().value
     val tasks = state.monthTasks
     val currentDayTasks = tasks.filter {
@@ -141,7 +142,7 @@ fun TasksList(
     tasks: List<Task>,
     onTaskEdit: (task: Task) -> Unit
 ) {
-    val viewModel: TaskViewModel = viewModel()
+    val viewModel: TaskViewModel = hiltViewModel()
     val state = rememberLazyListState()
     return LazyColumn(
         state = state,

@@ -1,12 +1,14 @@
 package com.vanyscore.app
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class ApplicationComponent : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Services.bindApplicationContext(this)
-        Services.build()
+//        Services.bindApplicationContext(this)
+//        Services.build()
     }
 }

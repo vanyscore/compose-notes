@@ -3,10 +3,10 @@ package com.vanyscore.tasks.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.app.AppState
-import com.vanyscore.app.Services
 import com.vanyscore.app.utils.DateUtils
 import com.vanyscore.tasks.data.ITaskRepo
 import com.vanyscore.tasks.data.Task
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,9 +14,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
+import javax.inject.Inject
 
-class TaskViewModel(
-    private val repository: ITaskRepo = Services.tasksRepo
+@HiltViewModel
+class TaskViewModel @Inject constructor(
+    private val repository: ITaskRepo
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MainViewState())

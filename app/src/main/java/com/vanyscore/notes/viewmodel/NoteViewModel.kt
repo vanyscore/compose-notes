@@ -4,9 +4,9 @@ import android.net.Uri
 import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vanyscore.app.Services
 import com.vanyscore.notes.data.INoteRepo
 import com.vanyscore.notes.domain.Note
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,14 +15,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
+import javax.inject.Inject
 
 data class NoteState(
     val note: Note,
     val canClose: Boolean = false,
 )
 
-class NoteViewModel(
-    private val repo: INoteRepo = Services.notesRepo
+@HiltViewModel
+class NoteViewModel @Inject constructor(
+    private val repo: INoteRepo
 ) : ViewModel() {
 
     private var noteId: Int? = null

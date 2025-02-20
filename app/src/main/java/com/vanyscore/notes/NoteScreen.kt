@@ -1,7 +1,5 @@
 package com.vanyscore.notes
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
@@ -35,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanyscore.app.AppState
 import com.vanyscore.app.ui.AttachmentsControl
@@ -52,7 +50,8 @@ fun NoteScreen(
     val isViewModelInit = remember {
         mutableStateOf(false)
     }
-    val viewModel = viewModel<NoteViewModel>().apply {
+
+    val viewModel = hiltViewModel<NoteViewModel>().apply {
         if (!isViewModelInit.value && noteId != null) {
             attachNoteId(noteId)
             isViewModelInit.value = true
@@ -197,7 +196,7 @@ fun NoteScreen(
 
 @Composable
 fun RemoveNoteButton() {
-    val viewModel = viewModel<NoteViewModel>()
+    val viewModel = hiltViewModel<NoteViewModel>()
     val state = viewModel.state.collectAsState().value
     val note = state.note
     IconButton(

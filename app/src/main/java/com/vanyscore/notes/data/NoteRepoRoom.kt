@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.net.Uri
 import androidx.core.net.toFile
 import androidx.core.net.toUri
-import com.vanyscore.app.Services
 import com.vanyscore.app.domain.EventBus
 import com.vanyscore.app.utils.DateUtils
 import com.vanyscore.app.utils.FileUtil
@@ -18,9 +17,9 @@ import java.util.UUID
 
 class NoteRepoRoom(
     private val dao: NotesDao,
-    private val contentResolver: ContentResolver = Services.contentResolver,
-    private val outputImagesDir: File = Services.noteImagesDir,
-    private val cacheDir: File = Services.cacheDir,
+    private val contentResolver: ContentResolver,
+    private val outputImagesDir: File,
+    private val cacheDir: File,
 ) : INoteRepo {
 
     override suspend fun createNote(note: Note) {
