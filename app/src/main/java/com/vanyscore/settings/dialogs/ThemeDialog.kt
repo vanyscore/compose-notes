@@ -16,17 +16,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.vanyscore.app.theme.mainThemes
+import com.vanyscore.app.AppState
+import com.vanyscore.app.theme.lightThemes
 
 @Composable
 fun ThemeDialog(onDismiss: () -> Unit) {
     return Dialog(onDismissRequest = onDismiss) {
-        val themes = mainThemes.map {
-            it.primary
-        }
+        val themes = lightThemes
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
@@ -36,7 +34,8 @@ fun ThemeDialog(onDismiss: () -> Unit) {
                 Text("Цвет")
                 Spacer(modifier = Modifier.height(8.dp))
                 Row {
-                    themes.map { color ->
+                    themes.map { themeType ->
+                        val theme = themeType.toColorScheme()
                         Box(
                             modifier = Modifier.padding(start = 8.dp, end = 8.dp)
                         ) {
@@ -44,9 +43,13 @@ fun ThemeDialog(onDismiss: () -> Unit) {
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
-                                    .background(color)
+                                    .background(theme.primary)
                                     .clickable {
-                                        // TODO(vanyscore): Add change theme action().
+                                        val appState = AppState.source.value
+                                        AppState.updateState(appState.copy(
+                                            theme = themeType
+                                        ))
+                                        onDismiss.invoke()
                                     }
                             )
                         }

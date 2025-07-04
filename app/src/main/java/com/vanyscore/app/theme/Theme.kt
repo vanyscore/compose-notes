@@ -1,15 +1,18 @@
 package com.vanyscore.app.theme
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
+import com.vanyscore.app.AppState
 
 // Предположим, что вы объявили эти цвета в другом файле (Color.kt)
 private val YellowColorScheme = lightColorScheme(
     primary = Amber500,
-    onPrimary = DarkAmber,
+    onPrimary = White,
     primaryContainer = Amber100,
     onPrimaryContainer = DeepBrown,
     secondary = Brown500,
@@ -335,8 +338,9 @@ private val PurpleDarkColorScheme = darkColorScheme(
     surfaceTint = Purple200,
 )
 
-val mainThemes = listOf(YellowColorScheme, GreenLightColorScheme,
-    RedLightColorScheme, BlueLightColorScheme, PurpleLightColorScheme)
+val lightThemes = listOf(AppTheme.YELLOW_LIGHT,
+    AppTheme.GREEN_LIGHT, AppTheme.RED_LIGHT, AppTheme.BLUE_LIGHT, AppTheme.PURPLE_LIGHT
+)
 
 enum class AppTheme {
     YELLOW_LIGHT,
@@ -348,26 +352,31 @@ enum class AppTheme {
     BLUE_LIGHT,
     BLUE_DARK,
     PURPLE_LIGHT,
-    PURPLE_DARK,
+    PURPLE_DARK;
+
+    fun toColorScheme(): ColorScheme {
+        return when (this) {
+            YELLOW_LIGHT -> YellowColorScheme
+            YELLOW_DARK -> YellowDarkColorScheme
+            GREEN_LIGHT -> GreenLightColorScheme
+            GREEN_DARK -> GreenDarkColorScheme
+            RED_LIGHT -> RedLightColorScheme
+            RED_DARK -> RedDarkColorScheme
+            BLUE_LIGHT -> BlueLightColorScheme
+            BLUE_DARK -> BlueDarkColorScheme
+            PURPLE_LIGHT -> PurpleLightColorScheme
+            PURPLE_DARK -> PurpleDarkColorScheme
+        }
+    }
 }
 
 @Composable
-fun TasksTheme(
-    theme: AppTheme = AppTheme.YELLOW_LIGHT,
+fun ThemeProvider(
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when (theme) {
-        AppTheme.YELLOW_LIGHT -> YellowColorScheme
-        AppTheme.YELLOW_DARK -> YellowDarkColorScheme
-        AppTheme.GREEN_LIGHT -> GreenLightColorScheme
-        AppTheme.GREEN_DARK -> GreenDarkColorScheme
-        AppTheme.RED_LIGHT -> RedLightColorScheme
-        AppTheme.RED_DARK -> RedDarkColorScheme
-        AppTheme.BLUE_LIGHT -> BlueLightColorScheme
-        AppTheme.BLUE_DARK -> BlueDarkColorScheme
-        AppTheme.PURPLE_LIGHT -> PurpleLightColorScheme
-        AppTheme.PURPLE_DARK -> PurpleDarkColorScheme
-    }
+    val themeState = AppState.source.collectAsState()
+    val theme = themeState.value.theme
+    val colorScheme = theme.toColorScheme()
 
     MaterialTheme(
         colorScheme = colorScheme,

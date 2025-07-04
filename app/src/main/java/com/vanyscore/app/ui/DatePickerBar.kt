@@ -95,6 +95,7 @@ fun SettingsButton(isVisible: Boolean = true) {
     ) {
         Icon(
             imageVector = Icons.Default.Settings,
+            tint = MaterialTheme.colorScheme.onPrimary,
             contentDescription = "Settings" // Accessibility label
         )
     }
