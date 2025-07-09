@@ -19,12 +19,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.vanyscore.app.theme.AppTheme
-import com.vanyscore.app.theme.lightThemes
+import com.vanyscore.app.theme.AppThemeType
 
 @Composable
 fun ThemeDialog(onSelect: (AppTheme) -> Unit, onDismiss: () -> Unit, ) {
     return Dialog(onDismissRequest = onDismiss) {
-        val themes = lightThemes
+        val themes = AppTheme.entries.toTypedArray()
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
@@ -35,7 +35,7 @@ fun ThemeDialog(onSelect: (AppTheme) -> Unit, onDismiss: () -> Unit, ) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row {
                     themes.map { themeType ->
-                        val theme = themeType.toColorScheme()
+                        val theme = themeType.toColorScheme(AppThemeType.LIGHT)
                         Box(
                             modifier = Modifier.padding(start = 8.dp, end = 8.dp)
                         ) {
