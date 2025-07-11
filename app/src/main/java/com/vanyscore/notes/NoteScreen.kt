@@ -29,8 +29,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vanyscore.app.composes.BackButton
 import com.vanyscore.app.navigation.LocalNavController
@@ -72,7 +74,10 @@ fun NoteScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(R.string.note))
+                    Text(stringResource(R.string.note), style = TextStyle(
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    ))
                 },
                 colors = topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary
@@ -210,7 +215,7 @@ fun RemoveNoteButton() {
         Icon(
             ImageVector.vectorResource(R.drawable.ic_trash),
             "remove",
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
