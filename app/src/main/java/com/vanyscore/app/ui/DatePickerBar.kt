@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -13,8 +12,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerColors
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,14 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.vanyscore.app.navigation.LocalNavController
+import com.vanyscore.app.navigation.LocalMainNavController
 import com.vanyscore.app.navigation.openSettings
-import com.vanyscore.app.viewmodel.AppViewModel
 import com.vanyscore.app.viewmodel.LocalAppViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -52,8 +46,6 @@ fun DatePickerBar() {
         mutableStateOf(false)
     }
     return TopAppBar(
-        modifier = Modifier
-            .height(56.dp),
         navigationIcon = {
             SettingsButton(
                 isVisible = false
@@ -62,7 +54,7 @@ fun DatePickerBar() {
         title = {
             Box(
                 modifier = Modifier
-                    .padding(end = 16.dp, start = 16.dp, top = 4.dp, bottom = 4.dp)
+                    .padding(16.dp)
                     .fillMaxWidth()
                     .clickable {
                         dialogState.value = true
@@ -90,7 +82,7 @@ fun DatePickerBar() {
 
 @Composable
 fun SettingsButton(isVisible: Boolean = true) {
-    val navController = LocalNavController.current
+    val navController = LocalMainNavController.current
     IconButton(
         modifier = Modifier.alpha(if (isVisible) 1f else 0f),
         onClick = {

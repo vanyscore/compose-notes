@@ -2,7 +2,9 @@ package com.vanyscore.app.navigation
 
 object AppRoutes {
     const val MAIN = "main"
+    const val TASKS = "tasks"
     const val NOTE = "note?id={${AppRouteArgs.NOTE_ID}}"
+    const val NOTES = "notes"
     const val SETTINGS = "settings"
 }
 

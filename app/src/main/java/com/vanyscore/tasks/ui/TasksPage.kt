@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.vanyscore.app.ui.DatePickerBar
 import com.vanyscore.app.ui.DayPickerBar
 import com.vanyscore.app.ui.DayStatus
 import com.vanyscore.app.utils.DateUtils

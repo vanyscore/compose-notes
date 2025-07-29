@@ -17,7 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.vanyscore.app.navigation.LocalNavController
+import com.vanyscore.app.navigation.LocalMainNavController
 import com.vanyscore.app.navigation.openNote
 import com.vanyscore.app.ui.DatePickerBar
 import com.vanyscore.notes.NotesPage
@@ -29,7 +29,7 @@ fun MainScreen() {
     val selectedTab = remember {
         mutableIntStateOf(0)
     }
-    val navController = LocalNavController.current
+    val navController = LocalMainNavController.current
     return Scaffold(
         topBar = {
             DatePickerBar()
