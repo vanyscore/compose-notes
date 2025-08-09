@@ -26,12 +26,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.vanyscore.app.navigation.LocalMainNavController
 import com.vanyscore.app.navigation.openSettings
 import com.vanyscore.app.viewmodel.LocalAppViewModel
@@ -97,31 +99,22 @@ fun SettingsButton(isVisible: Boolean = true) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDialogBuild(dialogState: MutableState<Boolean>) {
     val appViewModel = LocalAppViewModel.current
     val appState = appViewModel.state
     val state = appState.collectAsState()
-    val datePickerState = rememberDatePickerState(
-        initialDisplayedMonthMillis = state.value.date.time,
-    )
-    DatePickerDialog(
-        onDismissRequest = {
-            dialogState.value = false
-        },
-        confirmButton = {
-            val selectedDateInMillis = datePickerState.selectedDateMillis
-            if (selectedDateInMillis != null) {
+    Dialog(onDismissRequest = {
+        dialogState.value = false
+    }) {
+        AppDatePicker(
+            initDateMillis = state.value.date.time,
+            onSelect = { time ->
                 dialogState.value = false
                 appViewModel.updateDate(Calendar.getInstance().apply {
-                    timeInMillis = selectedDateInMillis
+                    timeInMillis = time
                 }.time)
-            }
-        },
-    ) {
-        val currDateInMillis = Calendar.getInstance().timeInMillis
-        AppDatePicker()
+            })
     }
 }
 

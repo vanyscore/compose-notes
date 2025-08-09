@@ -1,16 +1,21 @@
 package com.vanyscore.app.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.vanyscore.app.utils.DateUtils
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -36,6 +42,7 @@ import java.util.Locale
 fun AppDatePicker(
     initDateMillis: Long? = Calendar.getInstance().timeInMillis,
     selectedMillis: List<Long> = emptyList(),
+    onSelect: (Long) -> Unit
 ) {
     val currentDt = remember { mutableStateOf(Calendar.getInstance().apply {
         if (initDateMillis != null) {
@@ -43,22 +50,49 @@ fun AppDatePicker(
         }
     }.time) }
     val initDt = Calendar.getInstance().time
-        Surface(
-        modifier = Modifier.padding(16.dp),
+
+    Surface(
         shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.onPrimary
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
         ) {
             MonthSelect(dt = currentDt)
-            Days(currentDt = currentDt, initDt = initDt, selectedMillis)
+            Box(modifier = Modifier.padding(horizontal = 6.dp)) {
+                Weekdays()
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Days(currentDt = currentDt, initDt = initDt, selectedMillis, onSelect = onSelect)
+        }
+    }
+}
+
+@Composable
+fun Weekdays() {
+    val calendar = Calendar.getInstance()
+    val weekDates = mutableListOf<Date>()
+    for (i: Int in 1..7) {
+        weekDates.add(calendar.apply { set(Calendar.DAY_OF_WEEK, i) }.time)
+    }
+    val dateFormat = SimpleDateFormat("E", Locale.getDefault())
+    return Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        weekDates.map { dt ->
+            Text(dateFormat.format(dt).uppercase(Locale.getDefault()), style = TextStyle(
+                fontSize = 16.sp
+            ))
         }
     }
 }
 
 @Composable
 fun MonthSelect(dt: MutableState<Date>) {
-    val dateFormat = SimpleDateFormat("MMMM", Locale.getDefault())
+    val dtFormat = SimpleDateFormat("MMMM, yyyy", Locale.getDefault())
     return Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -74,7 +108,7 @@ fun MonthSelect(dt: MutableState<Date>) {
         ) {
             Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "prevDate")
         }
-        Text(dateFormat.format(dt.value), style = TextStyle(
+        Text(dtFormat.format(dt.value), style = TextStyle(
             fontWeight = FontWeight.Bold
         ))
         IconButton(
@@ -91,7 +125,7 @@ fun MonthSelect(dt: MutableState<Date>) {
 }
 
 @Composable
-fun Days(currentDt: MutableState<Date>, initDt: Date, selectedMillis: List<Long>) {
+fun Days(currentDt: MutableState<Date>, initDt: Date, selectedMillis: List<Long>, onSelect: (Long) -> Unit) {
     val firstDt = Calendar.getInstance().apply {
         time = currentDt.value
     }
@@ -138,6 +172,11 @@ fun Days(currentDt: MutableState<Date>, initDt: Date, selectedMillis: List<Long>
                     val color = if (isCurrentDt) MaterialTheme.colorScheme.primary
                     else if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.surface
                     Surface(
+                        modifier = Modifier
+                            .padding(0.dp)
+                            .clickable {
+                                onSelect(showDt.time)
+                            },
                         shape = CircleShape,
                         color = color
                     ) {
