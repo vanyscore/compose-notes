@@ -1,5 +1,6 @@
 package com.vanyscore.app.ui
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,17 +15,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,15 +34,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanyscore.app.utils.DateUtils
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+interface DatesSelectedChecker {
+    suspend fun getSelectedDatesAsMillis(startDate: Date, endDate: Date): List<Long>
+}
+
 @Composable
 fun AppDatePicker(
     initDateMillis: Long? = Calendar.getInstance().timeInMillis,
-    selectedMillis: List<Long> = emptyList(),
+    datesSelectedChecker: DatesSelectedChecker? = null,
     onSelect: (Long) -> Unit
 ) {
     val currentDt = remember { mutableStateOf(Calendar.getInstance().apply {
@@ -65,7 +71,7 @@ fun AppDatePicker(
                 Weekdays()
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Days(currentDt = currentDt, initDt = initDt, selectedMillis, onSelect = onSelect)
+            Days(currentDt = currentDt, initDt = initDt, datesSelectedChecker = datesSelectedChecker, onSelect = onSelect)
         }
     }
 }
@@ -125,7 +131,7 @@ fun MonthSelect(dt: MutableState<Date>) {
 }
 
 @Composable
-fun Days(currentDt: MutableState<Date>, initDt: Date, selectedMillis: List<Long>, onSelect: (Long) -> Unit) {
+fun Days(currentDt: MutableState<Date>, initDt: Date, onSelect: (Long) -> Unit, datesSelectedChecker: DatesSelectedChecker?) {
     val firstDt = Calendar.getInstance().apply {
         time = currentDt.value
     }
@@ -137,7 +143,29 @@ fun Days(currentDt: MutableState<Date>, initDt: Date, selectedMillis: List<Long>
     }
     val firstDtTime = firstDt.time
     val formatter = SimpleDateFormat("dd", Locale.getDefault())
-    val selectedDates = selectedMillis.map {
+    val selectedMillis = remember { mutableStateOf(mutableListOf<Long>()) }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(currentDt.value) {
+        scope.launch {
+            val startDt = Calendar.getInstance().apply {
+                time = currentDt.value
+            }
+            while (startDt.get(Calendar.DAY_OF_MONTH) != 1) {
+                startDt.set(Calendar.DAY_OF_YEAR, startDt.get(Calendar.DAY_OF_YEAR) - 1)
+            }
+            val endDt = Calendar.getInstance().apply {
+                time = currentDt.value
+            }
+            while (endDt.get(Calendar.DAY_OF_MONTH) != endDt.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+                endDt.set(Calendar.DAY_OF_YEAR, endDt.get(Calendar.DAY_OF_YEAR) + 1)
+            }
+            Log.d("picker", "get from ${startDt.time}, to ${endDt.time}")
+            val selectedDatesAsMillis = datesSelectedChecker?.getSelectedDatesAsMillis(startDt.time, endDt.time)?.toMutableList()
+            Log.d("picker", "dates: $selectedDatesAsMillis")
+            selectedMillis.value = selectedDatesAsMillis ?: mutableListOf()
+        }
+    }
+    val selectedDates = selectedMillis.value.map {
         Calendar.getInstance().apply {
             timeInMillis = it
         }.time
@@ -163,6 +191,7 @@ fun Days(currentDt: MutableState<Date>, initDt: Date, selectedMillis: List<Long>
                     }.get(Calendar.MONTH) == Calendar.getInstance().apply {
                         time = currentDt.value
                     }.get(Calendar.MONTH)
+                    val isCurrent = DateUtils.isDateEqualsByDay(showDt, currentDt.value)
                     var isSelected = false
                     selectedDates.forEach {  selDt ->
                         if (DateUtils.isDateEqualsByDay(selDt, showDt)) {
@@ -170,7 +199,9 @@ fun Days(currentDt: MutableState<Date>, initDt: Date, selectedMillis: List<Long>
                         }
                     }
                     val color = if (isCurrentDt) MaterialTheme.colorScheme.primary
-                    else if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.surface
+                    else if (isCurrent) MaterialTheme.colorScheme.onPrimary else {
+                        if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface
+                    }
                     Surface(
                         modifier = Modifier
                             .padding(0.dp)

@@ -36,7 +36,7 @@ class NoteRepoInMemory : INoteRepo {
     }
 
     override suspend fun attachImage(note: Note, uri: Uri): Note? {
-        TODO("Not yet implemented")
+        return null
     }
 
     override suspend fun getNotes(fromDate: Date, toDate: Date): List<Note> {
@@ -57,6 +57,10 @@ class NoteRepoInMemory : INoteRepo {
         return _notes.filter {
             DateUtils.isDateEqualsByDay(it.created, fromDate)
         }
+    }
+
+    override suspend fun getNotes(date: Date): List<Note> {
+        return emptyList()
     }
 
     override suspend fun getNote(id: Int): Note? {

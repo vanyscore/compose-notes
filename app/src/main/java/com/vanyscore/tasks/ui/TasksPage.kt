@@ -1,6 +1,5 @@
 package com.vanyscore.tasks.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -46,14 +45,12 @@ import com.vanyscore.app.ui.DatePickerBar
 import com.vanyscore.app.ui.DayPickerBar
 import com.vanyscore.app.ui.DayStatus
 import com.vanyscore.app.utils.DateUtils
-import com.vanyscore.app.viewmodel.AppViewModel
 import com.vanyscore.app.viewmodel.LocalAppViewModel
 import com.vanyscore.tasks.R
 import com.vanyscore.tasks.data.Task
 import com.vanyscore.tasks.ui.dialogs.EditTaskDialog
 import com.vanyscore.tasks.viewmodel.TaskViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TasksPage() {
     val viewModel = hiltViewModel<TaskViewModel>()
@@ -91,6 +88,7 @@ fun TasksPage() {
     val appViewModel = LocalAppViewModel.current
 
     return Scaffold(
+        topBar = { DatePickerBar() },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 dialogState.value = true
@@ -101,8 +99,10 @@ fun TasksPage() {
                 )
             }
         }
-    ) {
-        Column {
+    ) { padding ->
+        Column(
+            modifier = Modifier.padding(padding)
+        ) {
             DayPickerBar(
                 state.monthDates,
                 state.selectedDate,

@@ -2,6 +2,7 @@ package com.vanyscore.notes.data
 
 import android.content.ContentResolver
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.vanyscore.app.domain.EventBus
@@ -12,6 +13,7 @@ import com.vanyscore.notes.domain.Note
 import com.vanyscore.notes.domain.NoteImage
 import com.vanyscore.notes.domain.moveIfItTemporary
 import java.io.File
+import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 
@@ -47,8 +49,25 @@ class NoteRepoRoom(
 
     override suspend fun getNotes(fromDate: Date, toDate: Date): List<Note> {
         val notes = dao.getNotes(fromDate, toDate).withImages(dao)
+        return notes
+    }
+
+    override suspend fun getNotes(date: Date): List<Note> {
+        val startDate = Calendar.getInstance().apply {
+            time = date
+            set(Calendar.HOUR, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }.time
+        val endDate = Calendar.getInstance().apply {
+            time = date
+            set(Calendar.HOUR, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+        }.time
+        val notes = dao.getNotes(startDate, endDate).withImages(dao)
         return notes.filter {
-            DateUtils.isDateEqualsByDay(it.created, fromDate)
+            DateUtils.isDateEqualsByDay(it.created, date)
         }
     }
 

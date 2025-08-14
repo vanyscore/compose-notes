@@ -1,9 +1,11 @@
 package com.vanyscore.notes.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.app.domain.Event
 import com.vanyscore.app.domain.EventBus
+import com.vanyscore.app.ui.DatesSelectedChecker
 import com.vanyscore.app.viewmodel.AppViewModel
 import com.vanyscore.notes.data.INoteRepo
 import com.vanyscore.notes.domain.Note
@@ -18,14 +20,14 @@ import javax.inject.Inject
 
 data class NotesState(
     val notes: List<Note> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = false
 )
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
     private val repo: INoteRepo,
     private val appViewModel: AppViewModel
-) : ViewModel() {
+) : ViewModel(), DatesSelectedChecker {
 
     private val _state = MutableStateFlow(NotesState())
     val state = _state.asStateFlow()
@@ -48,7 +50,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun refresh() {
+    private fun refresh() {
         viewModelScope.launch {
             val state = _state.value
             _state.update {
@@ -56,21 +58,8 @@ class NotesViewModel @Inject constructor(
                     isLoading = true
                 )
             }
-            val currentDate = this@NotesViewModel._currentDate ?: Calendar.getInstance().time
-            val calendar = Calendar.getInstance()
-            val startDate = calendar.apply {
-                time = currentDate
-                set(Calendar.HOUR, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-            }.time
-            val endDate = calendar.apply {
-                time = currentDate
-                set(Calendar.HOUR, 23)
-                set(Calendar.MINUTE, 59)
-                set(Calendar.SECOND, 59)
-            }.time
-            val notes = repo.getNotes(startDate, endDate)
+            val currentDate = _currentDate ?: Calendar.getInstance().time
+            val notes = repo.getNotes(currentDate)
             _state.update {
                 state.copy(
                     notes = notes,
@@ -78,5 +67,10 @@ class NotesViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    override suspend fun getSelectedDatesAsMillis(startDate: Date, endDate: Date): List<Long> {
+        val notes = repo.getNotes(fromDate = startDate, toDate = endDate)
+        return notes.map { dt -> dt.created.time }
     }
 }
