@@ -185,22 +185,24 @@ fun Days(currentDt: MutableState<Date>, initDt: Date, onSelect: (Long) -> Unit, 
                         time = firstDtTime
                         set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + (i * 7 + k))
                     }.time
-                    val isCurrentDt = DateUtils.isDateEqualsByDay(showDt, initDt)
+                    val isToday = DateUtils.isDateEqualsByDay(showDt, initDt)
                     val isCurrentMonth = Calendar.getInstance().apply {
                         time = showDt
                     }.get(Calendar.MONTH) == Calendar.getInstance().apply {
                         time = currentDt.value
                     }.get(Calendar.MONTH)
-                    val isCurrent = DateUtils.isDateEqualsByDay(showDt, currentDt.value)
                     var isSelected = false
                     selectedDates.forEach {  selDt ->
                         if (DateUtils.isDateEqualsByDay(selDt, showDt)) {
                             isSelected = true
                         }
                     }
-                    val color = if (isCurrentDt) MaterialTheme.colorScheme.primary
-                    else if (isCurrent) MaterialTheme.colorScheme.onPrimary else {
-                        if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface
+                    val color = if (isToday) {
+                        MaterialTheme.colorScheme.primary
+                    } else if (isSelected) {
+                        MaterialTheme.colorScheme.secondary
+                    } else {
+                        MaterialTheme.colorScheme.surface
                     }
                     Surface(
                         modifier = Modifier
