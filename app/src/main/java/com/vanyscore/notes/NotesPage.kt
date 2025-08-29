@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vanyscore.app.ui.DatePickerBar
 import com.vanyscore.notes.domain.Note
+import com.vanyscore.notes.ui.NoteItem
 import com.vanyscore.notes.viewmodel.NotesViewModel
 
 @Composable

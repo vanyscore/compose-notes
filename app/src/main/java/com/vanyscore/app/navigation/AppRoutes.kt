@@ -5,6 +5,7 @@ object AppRoutes {
     const val TASKS = "tasks"
     const val NOTE = "note?id={${AppRouteArgs.NOTE_ID}}"
     const val NOTES = "notes"
+    const val NOTES_SECTIONS = "notes_sections"
     const val SETTINGS = "settings"
 }
 

@@ -1,4 +1,4 @@
-package com.vanyscore.notes
+package com.vanyscore.notes.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

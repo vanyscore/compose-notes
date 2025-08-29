@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import com.vanyscore.app.MainScreenWithBottomBar
 import com.vanyscore.notes.NoteScreen
 import com.vanyscore.notes.domain.Note
+import com.vanyscore.notes.ui.NoteSectionsScreen
 import com.vanyscore.settings.SettingsScreen
 
 var LocalMainNavController = staticCompositionLocalOf<NavHostController> {
@@ -28,10 +29,13 @@ fun App() {
     ) {
         NavHost(
             navController = LocalMainNavController.current,
-            startDestination = AppRoutes.MAIN
+            startDestination = AppRoutes.NOTES_SECTIONS
         ) {
             composable(AppRoutes.MAIN) {
                 MainScreenWithBottomBar()
+            }
+            composable(AppRoutes.NOTES_SECTIONS) {
+                NoteSectionsScreen()
             }
             composable(AppRoutes.NOTE, listOf(
                 navArgument(AppRouteArgs.NOTE_ID) {
