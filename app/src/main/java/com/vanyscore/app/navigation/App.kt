@@ -29,13 +29,10 @@ fun App() {
     ) {
         NavHost(
             navController = LocalMainNavController.current,
-            startDestination = AppRoutes.NOTES_SECTIONS
+            startDestination = AppRoutes.MAIN
         ) {
             composable(AppRoutes.MAIN) {
                 MainScreenWithBottomBar()
-            }
-            composable(AppRoutes.NOTES_SECTIONS) {
-                NoteSectionsScreen()
             }
             composable(AppRoutes.NOTE, listOf(
                 navArgument(AppRouteArgs.NOTE_ID) {

@@ -32,10 +32,10 @@ fun AppBottomBar(
     navController: NavController
 ) {
     val routes = listOf(
-        AppRoute(title = "Заметки", icon = Icons.Default.Edit, routePath = AppRoutes.NOTES),
+        AppRoute(title = "Заметки", icon = Icons.Default.Edit, routePath = AppRoutes.NOTES_SECTIONS),
         AppRoute(title = "Задачи", icon = Icons.Default.Build, routePath = AppRoutes.TASKS),
     )
-    val routeState = remember { mutableStateOf(AppRoutes.NOTES) }
+    val routeState = remember { mutableStateOf(AppRoutes.NOTES_SECTIONS) }
     val currentRoute = routeState.value
     Log.d("nav", "curr route: $currentRoute, ${routes.map { it.routePath }}")
     NavigationBar(
