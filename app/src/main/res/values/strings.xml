@@ -3,6 +3,7 @@
     <string name="note">Заметка</string>
     <string name="notes">Заметки</string>
     <string name="new_note_section">Новый раздел</string>
+    <string name="edit_note_section">Редактировать раздел</string>
     <string name="add">Добавить</string>
     <string name="tasks">Задачи"</string>
     <string name="create_task">Создать задачу</string>

@@ -11,9 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.vanyscore.app.MainScreenWithBottomBar
-import com.vanyscore.notes.NoteScreen
+import com.vanyscore.notes.screens.NoteScreen
 import com.vanyscore.notes.domain.Note
-import com.vanyscore.notes.ui.NoteSectionsScreen
 import com.vanyscore.settings.SettingsScreen
 
 var LocalMainNavController = staticCompositionLocalOf<NavHostController> {

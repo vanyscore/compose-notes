@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.vanyscore.app.navigation.LocalMainNavController
 import com.vanyscore.app.navigation.openNote
 import com.vanyscore.app.ui.DatePickerBar
-import com.vanyscore.notes.NotesPage
+import com.vanyscore.notes.screens.NotesPage
 import com.vanyscore.tasks.R
 import com.vanyscore.tasks.ui.TasksPage
 

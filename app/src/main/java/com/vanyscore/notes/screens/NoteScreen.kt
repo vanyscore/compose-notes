@@ -1,4 +1,4 @@
-package com.vanyscore.notes
+package com.vanyscore.notes.screens
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth

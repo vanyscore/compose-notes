@@ -11,10 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vanyscore.app.navigation.AppRoutes
 import com.vanyscore.app.navigation.LocalMainNavController
-import com.vanyscore.app.navigation.openNote
 import com.vanyscore.app.ui.AppBottomBar
-import com.vanyscore.notes.NotesPage
-import com.vanyscore.notes.ui.NoteSectionsScreen
+import com.vanyscore.notes.screens.NoteSectionsScreen
 import com.vanyscore.tasks.ui.TasksPage
 
 @Composable
