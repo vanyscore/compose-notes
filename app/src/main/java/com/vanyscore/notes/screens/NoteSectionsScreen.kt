@@ -25,6 +25,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,25 +37,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.vanyscore.notes.ui.NoteSection
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.vanyscore.notes.domain.NoteSection
+import com.vanyscore.notes.viewmodel.NoteSectionsViewModel
 import com.vanyscore.tasks.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteSectionsScreen() {
-    val sections = remember {
-        mutableStateListOf(
-            "Meeting Notes",
-            "Project Ideas",
-            "Shopping List",
-            "Travel Plans",
-            "Learning Goals",
-            "Daily Journal",
-            "Recipe Collection",
-            "Book Summaries",
-            "Workout Routine",
-            "Creative Writing"
-        )
-    }
+fun NoteSectionsScreen(
+    viewModel: NoteSectionsViewModel = hiltViewModel()
+) {
+    val state = viewModel.state.collectAsState().value
+    val sections = state.sections
     val sectionDialogState = remember {
         mutableStateOf(NoteSectionDialogState(isVisible = false, type = NoteSectionDialogType.ADD))
     }
@@ -71,9 +65,9 @@ fun NoteSectionsScreen() {
             ), actions = {
                 IconButton(onClick = {
                     sectionDialogState.value = sectionDialogState.value.copy(
+                        section = null,
                         isVisible = true,
                         type = NoteSectionDialogType.ADD,
-                        title = "",
                     )
                 }) {
                     Icon(Icons.Default.Add,
@@ -91,17 +85,17 @@ fun NoteSectionsScreen() {
                 .verticalScroll(scrollState)
         ) {
             sections.map { section ->
-                key(section) {
-                    NoteSection(title = section, onLongClick = {
+                key(section.name) {
+                    NoteSection(section = section, onLongClick = {
                         sectionDialogState.value = sectionDialogState.value.copy(
-                            title = section,
+                            section = section,
                             isVisible = true,
                             type = NoteSectionDialogType.EDIT
                         )
                     }, onClick = {
 
                     }, onRemove = {
-                        sections.remove(section)
+                        viewModel.deleteNoteSection(section)
                     })
                     Box(modifier = Modifier
                         .fillMaxWidth()
@@ -112,20 +106,23 @@ fun NoteSectionsScreen() {
         }
         if (sectionDialogState.value.isVisible) {
             NoteSectionDialog(
-                title = sectionDialogState.value.title,
+                section = sectionDialogState.value.section,
                 type = sectionDialogState.value.type,
                 onDismiss = {
                     sectionDialogState.value = sectionDialogState.value.copy(
                         isVisible = false,
                     )
                 }
-            ) { oldSectionTitle, newSectionTitle ->
+            ) { name ->
                 if (sectionDialogState.value.type == NoteSectionDialogType.ADD) {
-                    sections.add(newSectionTitle)
+                    viewModel.attachNoteSection(name)
                 } else {
-                    val index = sections.indexOf(oldSectionTitle)
-                    sections.remove(oldSectionTitle)
-                    sections.add(index, newSectionTitle)
+                    val originSection = sectionDialogState.value.section
+                    if (originSection != null) {
+                        viewModel.editNoteSection(originSection.copy(
+                            name = name,
+                        ))
+                    }
                 }
             }
         }
@@ -137,25 +134,26 @@ enum class NoteSectionDialogType {
 }
 
 data class NoteSectionDialogState(
-    val title: String = "",
+    val section: NoteSection? = null,
     val isVisible: Boolean,
     val type: NoteSectionDialogType
 )
 
 @Composable
 fun NoteSectionDialog(
-    title: String = "",
+    section: NoteSection?,
     type: NoteSectionDialogType,
     onDismiss: () -> Unit,
-    onResult: (String, String) -> Unit
+    onResult: (String) -> Unit
 ) {
+    val sectionName = section?.name ?: ""
     val oldTitle = remember {
-        "" + title
+        "" + sectionName
     }
     return Dialog(
         onDismissRequest = onDismiss,
     ) {
-        val text = remember { mutableStateOf(title) }
+        val text = remember { mutableStateOf(oldTitle) }
         val title = if (type == NoteSectionDialogType.ADD) stringResource(R.string.new_note_section) else stringResource(R.string.edit_note_section)
         val subtitle = if (type == NoteSectionDialogType.ADD) stringResource(R.string.add) else stringResource(R.string.apply)
         Column(
@@ -183,7 +181,7 @@ fun NoteSectionDialog(
                     .height(48.dp)
                     .fillMaxWidth(),
                 onClick = {
-                    onResult.invoke(oldTitle, text.value)
+                    onResult.invoke(text.value)
                     onDismiss()
                 },
                 shape = RoundedCornerShape(16.dp),

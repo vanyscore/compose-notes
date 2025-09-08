@@ -1,13 +1,14 @@
 package com.vanyscore.notes.data
 
 import android.net.Uri
+import androidx.compose.runtime.mutableStateListOf
 import com.vanyscore.app.domain.EventBus
 import com.vanyscore.app.utils.DateUtils
 import com.vanyscore.notes.domain.Note
+import com.vanyscore.notes.domain.NoteSection
 import java.util.Calendar
 import java.util.Date
 
-// TODO: Implement.
 class NoteRepoInMemory : INoteRepo {
 
     private var _id = 0
@@ -27,6 +28,49 @@ class NoteRepoInMemory : INoteRepo {
             edited = Calendar.getInstance().time
         )
     )
+
+    private val _noteSections = mutableStateListOf(
+        "Meeting Notes",
+        "Project Ideas",
+        "Shopping List",
+        "Travel Plans",
+        "Learning Goals",
+        "Daily Journal",
+        "Recipe Collection",
+        "Book Summaries",
+        "Workout Routine",
+        "Creative Writing"
+    ).mapIndexed { index, title ->
+        NoteSection(index, title)
+    }.toMutableList()
+
+    override suspend fun getNoteSections(): List<NoteSection> {
+        return mutableListOf<NoteSection>().apply {
+            addAll(_noteSections)
+        }
+    }
+
+    override suspend fun createNoteSection(name: String): NoteSection {
+        val newSection = NoteSection(_noteSections.size + 1, name)
+        _noteSections.add(newSection)
+        return newSection
+    }
+
+    override suspend fun editNoteSection(noteSection: NoteSection): NoteSection {
+        val foundSection = _noteSections.firstOrNull {
+            it.id == noteSection.id
+        }
+        val index = _noteSections.indexOf(foundSection)
+        _noteSections.removeAt(index)
+        _noteSections.add(index, noteSection)
+        return noteSection
+    }
+
+    override suspend fun deleteNoteSection(id: Int) {
+        _noteSections.removeIf {
+            it.id == id
+        }
+    }
 
     override suspend fun createNote(note: Note) {
         _notes.add(note.copy(

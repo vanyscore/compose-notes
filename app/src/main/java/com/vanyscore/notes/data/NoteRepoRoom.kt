@@ -11,6 +11,7 @@ import com.vanyscore.app.utils.FileUtil
 import com.vanyscore.app.utils.Logger
 import com.vanyscore.notes.domain.Note
 import com.vanyscore.notes.domain.NoteImage
+import com.vanyscore.notes.domain.NoteSection
 import com.vanyscore.notes.domain.moveIfItTemporary
 import java.io.File
 import java.util.Calendar
@@ -23,6 +24,21 @@ class NoteRepoRoom(
     private val outputImagesDir: File,
     private val cacheDir: File,
 ) : INoteRepo {
+    override suspend fun getNoteSections(): List<NoteSection> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun createNoteSection(name: String): NoteSection {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun editNoteSection(noteSection: NoteSection): NoteSection {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteNoteSection(id: Int) {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun createNote(note: Note) {
         val noteId = dao.createNote(note.toRoom()).toInt()

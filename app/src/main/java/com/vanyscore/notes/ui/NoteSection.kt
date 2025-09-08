@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.unit.dp
 import com.vanyscore.app.ui.DismissBackground
+import com.vanyscore.notes.domain.NoteSection
 import kotlin.math.abs
 
 fun String.toColor(): Color {
@@ -48,11 +49,12 @@ fun String.toColor(): Color {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun NoteSection(
-    title: String,
+    section: NoteSection,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onRemove: () -> Unit,
 ) {
+    val title = section.name
     val color = title.toColor()
     val dismissState = rememberDismissState(
         initialValue = DismissValue.Default,
