@@ -7,14 +7,12 @@ import com.vanyscore.app.data.IAppStorage
 import com.vanyscore.app.room.AppDatabase
 import com.vanyscore.app.viewmodel.AppViewModel
 import com.vanyscore.notes.data.INoteRepo
-import com.vanyscore.notes.data.NoteRepoInMemory
 import com.vanyscore.notes.data.NoteRepoRoom
 import com.vanyscore.tasks.data.ITaskRepo
 import com.vanyscore.tasks.data.TaskRepoRoom
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.io.File
@@ -31,7 +29,7 @@ class DatabaseModule {
     ): AppDatabase {
         return Room.databaseBuilder(
             context = context,
-            AppDatabase::class.java, "tn_database"
+            AppDatabase::class.java, name = "main"
         ).build()
     }
 }
@@ -57,13 +55,13 @@ class Modules {
         context: Context,
         database: AppDatabase,
     ): INoteRepo {
-        return NoteRepoInMemory()
-//        return NoteRepoRoom(
-//            dao = database.notesDao(),
-//            contentResolver = context.contentResolver,
-//            outputImagesDir = File(context.filesDir, "/note_images/"),
-//            cacheDir = context.cacheDir,
-//        )
+        return NoteRepoRoom(
+            dao = database.notesDao(),
+            noteSectionsDao = database.noteSectionsDao(),
+            contentResolver = context.contentResolver,
+            outputImagesDir = File(context.filesDir, "/note_images/"),
+            cacheDir = context.cacheDir,
+        )
     }
 
     @Provides

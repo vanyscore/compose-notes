@@ -14,6 +14,13 @@ import com.vanyscore.notes.domain.Note
 import com.vanyscore.notes.domain.NoteImage
 import java.util.Date
 
+@Entity(tableName = "note_sections")
+data class NoteSectionRoom(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int? = null,
+    val name: String
+)
+
 @Entity(tableName = "notes")
 data class NoteRoom (
     @PrimaryKey(autoGenerate = true)
@@ -77,6 +84,18 @@ interface NotesDao {
     suspend fun getImageByPath(path: String): List<NoteImageRoom>
     @Delete
     suspend fun deleteImage(noteImage: NoteImageRoom)
+}
+
+@Dao
+interface NoteSectionsDao {
+    @Insert
+    suspend fun createNoteSection(section: NoteSectionRoom): Long
+    @Query("SELECT * FROM note_sections")
+    suspend fun getNoteSections(): List<NoteSectionRoom>
+    @Update
+    suspend fun updateNoteSection(section: NoteSectionRoom)
+    @Delete
+    suspend fun deleteNoteSection(section: NoteSectionRoom)
 }
 
 suspend fun List<NoteRoom>.withImages(dao: NotesDao): List<Note> {

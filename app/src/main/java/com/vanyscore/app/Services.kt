@@ -18,7 +18,13 @@ object Services {
         )
     }
     val notesRepo: INoteRepo by lazy {
-        NoteRepoRoom(database.notesDao(), contentResolver, noteImagesDir, cacheDir)
+        NoteRepoRoom(
+            database.notesDao(),
+            database.noteSectionsDao(),
+            contentResolver,
+            noteImagesDir,
+            cacheDir
+        )
     }
 
     private lateinit var applicationContext: Context

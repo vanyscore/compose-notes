@@ -13,6 +13,8 @@ import com.vanyscore.notes.domain.Note
 import com.vanyscore.notes.domain.NoteImage
 import com.vanyscore.notes.domain.NoteSection
 import com.vanyscore.notes.domain.moveIfItTemporary
+import com.vanyscore.notes.domain.toDomain
+import com.vanyscore.notes.domain.toRoom
 import java.io.File
 import java.util.Calendar
 import java.util.Date
@@ -20,24 +22,32 @@ import java.util.UUID
 
 class NoteRepoRoom(
     private val dao: NotesDao,
+    private val noteSectionsDao: NoteSectionsDao,
     private val contentResolver: ContentResolver,
     private val outputImagesDir: File,
     private val cacheDir: File,
 ) : INoteRepo {
     override suspend fun getNoteSections(): List<NoteSection> {
-        TODO("Not yet implemented")
+        return noteSectionsDao.getNoteSections().mapNotNull {
+            it.toDomain()
+        }
     }
 
     override suspend fun createNoteSection(name: String): NoteSection {
-        TODO("Not yet implemented")
+        val section = NoteSectionRoom(name = name)
+        val id = noteSectionsDao.createNoteSection(section)
+        return NoteSection(id = id.toInt(), name = name)
     }
 
     override suspend fun editNoteSection(noteSection: NoteSection): NoteSection {
-        TODO("Not yet implemented")
+        val room = noteSection.toRoom()
+        noteSectionsDao.updateNoteSection(room)
+        return noteSection
     }
 
     override suspend fun deleteNoteSection(id: Int) {
-        TODO("Not yet implemented")
+        val room = NoteSectionRoom(id = id, name = "")
+        noteSectionsDao.deleteNoteSection(room)
     }
 
     override suspend fun createNote(note: Note) {
