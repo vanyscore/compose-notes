@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.vanyscore.app.ui.DatePickerBar
 import com.vanyscore.notes.domain.Note
 import com.vanyscore.notes.ui.NoteItem
+import com.vanyscore.notes.ui.NoteItemRedesign
 import com.vanyscore.notes.viewmodel.NotesViewModel
 
 @Composable
@@ -79,7 +80,7 @@ fun Notes(
         items(
             notes
         ) { note ->
-            NoteItem(
+            NoteItemRedesign(
                 note = note,
                 onClick = {
                     onTap(note)

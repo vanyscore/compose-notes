@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.vanyscore.app.navigation.LocalMainNavController
+import com.vanyscore.app.navigation.openNote
 import com.vanyscore.notes.domain.NoteSection
 import com.vanyscore.notes.ui.NoteSection
 import com.vanyscore.notes.viewmodel.NoteSectionsViewModel
@@ -52,6 +54,10 @@ import com.vanyscore.tasks.R
 fun NoteSectionsScreen(
     viewModel: NoteSectionsViewModel = hiltViewModel()
 ) {
+    val mainController = LocalMainNavController.current
+    return NotesPage {
+        mainController.openNote(it)
+    }
     val state = viewModel.state.collectAsState().value
     val sections = state.sections
     val sectionDialogState = remember {
