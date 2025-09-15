@@ -4,13 +4,18 @@ object AppRoutes {
     const val MAIN = "main"
     const val TASKS = "tasks"
     const val NOTE = "note?id={${AppRouteArgs.NOTE_ID}}"
-    const val NOTES = "notes"
+    const val NOTES = "notes?sectionId={${AppRouteArgs.SECTION_ID}}"
     const val NOTES_SECTIONS = "notes_sections"
     const val SETTINGS = "settings"
+
+    fun notes(sectionId: Int?): String {
+        return NOTES.replace("{${AppRouteArgs.SECTION_ID}}", sectionId.toString())
+    }
 }
 
 object AppRouteArgs {
     const val NOTE_ID = "noteId"
+    const val SECTION_ID = "sectionId"
 }
 
 object AppRoutSchemes {

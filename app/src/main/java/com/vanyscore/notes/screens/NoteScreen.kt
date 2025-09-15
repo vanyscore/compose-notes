@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vanyscore.app.composes.BackButton
-import com.vanyscore.app.navigation.LocalMainNavController
+import com.vanyscore.app.navigation.LocalRootNavController
 import com.vanyscore.app.ui.AttachmentsControl
 import com.vanyscore.app.ui.noIndicationClickable
 import com.vanyscore.app.viewmodel.LocalAppViewModel
@@ -52,7 +52,7 @@ fun NoteScreen(
 ) {
     val appViewModel = LocalAppViewModel.current
     val appState = appViewModel.state.collectAsState()
-    val navController = LocalMainNavController.current
+    val navController = LocalRootNavController.current
     val isViewModelInit = remember {
         mutableStateOf(false)
     }

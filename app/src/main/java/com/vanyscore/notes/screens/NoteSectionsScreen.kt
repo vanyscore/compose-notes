@@ -42,8 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.vanyscore.app.navigation.LocalMainNavController
-import com.vanyscore.app.navigation.openNote
+import androidx.navigation.NavController
+import com.vanyscore.app.LocalInnerNavController
+import com.vanyscore.app.navigation.AppRoutes
 import com.vanyscore.notes.domain.NoteSection
 import com.vanyscore.notes.ui.NoteSection
 import com.vanyscore.notes.viewmodel.NoteSectionsViewModel
@@ -52,12 +53,9 @@ import com.vanyscore.tasks.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteSectionsScreen(
-    viewModel: NoteSectionsViewModel = hiltViewModel()
+    viewModel: NoteSectionsViewModel = hiltViewModel(),
+    navController: NavController = LocalInnerNavController.current
 ) {
-    val mainController = LocalMainNavController.current
-    return NotesPage {
-        mainController.openNote(it)
-    }
     val state = viewModel.state.collectAsState().value
     val sections = state.sections
     val sectionDialogState = remember {
@@ -149,11 +147,12 @@ fun SectionsListEmpty(padding: PaddingValues) {
 fun SectionsList(
     padding: PaddingValues,
     viewModel: NoteSectionsViewModel = hiltViewModel(),
-    dialogState: MutableState<NoteSectionDialogState>
+    dialogState: MutableState<NoteSectionDialogState>,
 ) {
     val scrollState = rememberScrollState()
     val state = viewModel.state.collectAsState().value
     val sections = state.sections
+    val navController = LocalInnerNavController.current
     Column(
         modifier = Modifier
             .padding(0.dp, padding.calculateTopPadding(), 0.dp, 0.dp)
@@ -169,7 +168,7 @@ fun SectionsList(
                         type = NoteSectionDialogType.EDIT
                     )
                 }, onClick = {
-
+                    navController.navigate(AppRoutes.notes(section.id))
                 }, onRemove = {
                     viewModel.deleteNoteSection(section)
                 })

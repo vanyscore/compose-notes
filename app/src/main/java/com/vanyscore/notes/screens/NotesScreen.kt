@@ -1,5 +1,6 @@
 package com.vanyscore.notes.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,35 +14,66 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.vanyscore.app.LocalInnerNavController
 import com.vanyscore.app.ui.DatePickerBar
 import com.vanyscore.notes.domain.Note
-import com.vanyscore.notes.ui.NoteItem
 import com.vanyscore.notes.ui.NoteItemRedesign
 import com.vanyscore.notes.viewmodel.NotesViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesPage(
+fun NotesScreen(
     viewModel: NotesViewModel = hiltViewModel(),
-    openNote: (Note?) -> Unit
+    sectionId: Int? = null,
+    openNote: (Note?) -> Unit,
 ) {
     val state = viewModel.state.collectAsState().value
     val notes = state.notes
+    val navController = LocalInnerNavController.current
     return Scaffold(
-        topBar = { DatePickerBar(
-            datesSelectedChecker = viewModel
-        ) },
+        topBar = {
+            if (sectionId == null) {
+                DatePickerBar(
+                    datesSelectedChecker = viewModel
+                )
+            } else {
+                TopAppBar(title = {
+                    Text("Заметки", style = TextStyle(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 18.sp
+                    ))
+                }, colors = TopAppBarDefaults .topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ), navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.navigateUp()
+                        }
+                    ) {
+                        Icon(Icons.Default.ArrowBack, "go_back", tint = MaterialTheme.colorScheme.onPrimary)
+                    }
+                })
+            }
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {

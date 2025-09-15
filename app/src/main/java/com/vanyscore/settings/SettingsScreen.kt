@@ -25,7 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanyscore.app.composes.BackButton
-import com.vanyscore.app.navigation.LocalMainNavController
+import com.vanyscore.app.navigation.LocalRootNavController
 import com.vanyscore.app.theme.AppThemeType
 import com.vanyscore.app.ui.noIndicationClickable
 import com.vanyscore.settings.dialogs.ThemeDialog
@@ -35,7 +35,7 @@ import com.vanyscore.tasks.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen() {
-    val navController = LocalMainNavController.current
+    val navController = LocalRootNavController.current
     val isThemeDialogShow = remember { mutableStateOf(false) }
     val isThemeDialogShowOn = isThemeDialogShow.value
     val viewModel = LocalAppViewModel.current

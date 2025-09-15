@@ -15,7 +15,7 @@ import com.vanyscore.notes.screens.NoteScreen
 import com.vanyscore.notes.domain.Note
 import com.vanyscore.settings.SettingsScreen
 
-var LocalMainNavController = staticCompositionLocalOf<NavHostController> {
+var LocalRootNavController = staticCompositionLocalOf<NavHostController> {
     error("No navController provided")
 }
 
@@ -24,10 +24,10 @@ fun App() {
     val navController = rememberNavController()
 
     CompositionLocalProvider(
-        LocalMainNavController provides navController
+        LocalRootNavController provides navController
     ) {
         NavHost(
-            navController = LocalMainNavController.current,
+            navController = LocalRootNavController.current,
             startDestination = AppRoutes.MAIN
         ) {
             composable(AppRoutes.MAIN) {
