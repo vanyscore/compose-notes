@@ -9,6 +9,7 @@ import java.util.Date
 
 data class Note(
     val id: Int? = null,
+    val sectionId: Int? = null,
     val title: String = "",
     val description: String = "",
     val created: Date = Calendar.getInstance().time,

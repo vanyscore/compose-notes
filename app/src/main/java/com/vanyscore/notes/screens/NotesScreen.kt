@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +47,11 @@ fun NotesScreen(
     sectionId: Int? = null,
     openNote: (Note?) -> Unit,
 ) {
+
+    LaunchedEffect(sectionId) {
+        viewModel.init(sectionId = sectionId)
+    }
+
     val state = viewModel.state.collectAsState().value
     val notes = state.notes
     val navController = LocalInnerNavController.current

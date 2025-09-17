@@ -29,6 +29,7 @@ class NoteViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var noteId: Int? = null
+    private var sectionId: Int? = null
 
     private val _state = MutableStateFlow(NoteState(
         note = Note()
@@ -51,8 +52,19 @@ class NoteViewModel @Inject constructor(
     }
 
 
-    fun attachNoteId(noteId: Int) {
+    fun attachArgs(noteId: Int?, sectionId: Int?) {
         this.noteId = noteId
+        this.sectionId = sectionId
+
+        if (sectionId != null) {
+            _state.update {
+                it.copy(
+                    note = _state.value.note.copy(
+                        sectionId = sectionId
+                    )
+                )
+            }
+        }
 
         refresh()
     }

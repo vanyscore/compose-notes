@@ -73,6 +73,10 @@ class NoteRepoRoom(
         )
     }
 
+    override suspend fun getNotes(sectionId: Int): List<Note> {
+        return dao.getNotes(sectionId).withImages(dao)
+    }
+
     override suspend fun getNotes(fromDate: Date, toDate: Date): List<Note> {
         val notes = dao.getNotes(fromDate, toDate).withImages(dao)
         return notes

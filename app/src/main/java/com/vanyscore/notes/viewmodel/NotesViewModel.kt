@@ -9,6 +9,8 @@ import com.vanyscore.app.ui.DatesSelectedChecker
 import com.vanyscore.app.viewmodel.AppViewModel
 import com.vanyscore.notes.data.INoteRepo
 import com.vanyscore.notes.domain.Note
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,15 +28,18 @@ data class NotesState(
 @HiltViewModel
 class NotesViewModel @Inject constructor(
     private val repo: INoteRepo,
-    private val appViewModel: AppViewModel
+    private val appViewModel: AppViewModel,
 ) : ViewModel(), DatesSelectedChecker {
 
     private val _state = MutableStateFlow(NotesState())
     val state = _state.asStateFlow()
 
+    var sectionId: Int? = null
+
     private var _currentDate: Date? = null
 
-    init {
+    fun init(sectionId: Int?) {
+        this.sectionId = sectionId
         viewModelScope.launch {
             EventBus.eventsSource.collect {
                 if (it == Event.NOTES_UPDATED) {
@@ -50,7 +55,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private fun refresh() {
+    fun refresh() {
         viewModelScope.launch {
             val state = _state.value
             _state.update {
@@ -59,7 +64,12 @@ class NotesViewModel @Inject constructor(
                 )
             }
             val currentDate = _currentDate ?: Calendar.getInstance().time
-            val notes = repo.getNotes(currentDate)
+            val sectionId = sectionId
+            val notes = if (sectionId == null) {
+                repo.getNotes(currentDate)
+            } else {
+                repo.getNotes(sectionId)
+            }
             _state.update {
                 state.copy(
                     notes = notes,

@@ -19,6 +19,7 @@ import com.vanyscore.app.navigation.AppRoutes
 import com.vanyscore.app.navigation.LocalRootNavController
 import com.vanyscore.app.navigation.openNote
 import com.vanyscore.app.ui.AppBottomBar
+import com.vanyscore.notes.domain.Note
 import com.vanyscore.notes.screens.NoteSectionsScreen
 import com.vanyscore.notes.screens.NotesScreen
 import com.vanyscore.tasks.ui.TasksPage
@@ -53,7 +54,9 @@ fun MainScreenWithBottomBar() {
                     NotesScreen(
                         sectionId =  sectionId
                     ) { note ->
-                        rootNavController.openNote(note)
+                        rootNavController.openNote(note ?: Note(
+                            sectionId = sectionId
+                        ))
                     }
                 }
                 composable(AppRoutes.NOTES_SECTIONS) {

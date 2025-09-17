@@ -25,6 +25,7 @@ data class NoteSectionRoom(
 data class NoteRoom (
     @PrimaryKey(autoGenerate = true)
     val id: Int? = null,
+    val sectionId: Int? = null,
     val title: String,
     val description: String,
     @TypeConverters(value = [DateConverter::class])
@@ -36,6 +37,7 @@ data class NoteRoom (
 fun NoteRoom.toDomain(images: List<Uri> = emptyList()): Note {
     return Note(
         id = id,
+        sectionId = sectionId,
         title = title,
         description = description,
         created = created,
@@ -49,6 +51,7 @@ fun NoteRoom.toDomain(images: List<Uri> = emptyList()): Note {
 fun Note.toRoom(): NoteRoom {
     return NoteRoom(
         id = id,
+        sectionId = sectionId,
         title = title,
         description = description,
         created = created,
@@ -70,6 +73,8 @@ interface NotesDao {
     suspend fun createNote(note: NoteRoom): Long
     @Query("SELECT * FROM notes WHERE created > (:fromDate) & created < (:endDate)")
     suspend fun getNotes(fromDate: Date, endDate: Date): List<NoteRoom>
+    @Query("SELECT * FROM notes WHERE sectionId = :sectionId")
+    suspend fun getNotes(sectionId: Int): List<NoteRoom>
     @Query("SELECT * FROM notes WHERE id = (:id)")
     suspend fun getNote(id: Int): List<NoteRoom>
     @Update

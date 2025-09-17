@@ -49,6 +49,7 @@ import com.vanyscore.tasks.R
 @Composable
 fun NoteScreen(
     noteId: Int?,
+    sectionId: Int?,
 ) {
     val appViewModel = LocalAppViewModel.current
     val appState = appViewModel.state.collectAsState()
@@ -58,8 +59,9 @@ fun NoteScreen(
     }
 
     val viewModel = hiltViewModel<NoteViewModel>().apply {
+        // TODO(vanyscore): Need refactor.
         if (!isViewModelInit.value && noteId != null) {
-            attachNoteId(noteId)
+            attachArgs(noteId, sectionId)
             isViewModelInit.value = true
         }
     }

@@ -36,11 +36,15 @@ fun App() {
             composable(AppRoutes.NOTE, listOf(
                 navArgument(AppRouteArgs.NOTE_ID) {
                     type = NavType.IntType
-                    defaultValue = -1
+                    defaultValue = 0
+                }, navArgument(AppRouteArgs.SECTION_ID) {
+                    type = NavType.IntType
+                    defaultValue = 0
                 }
             )) {
                 val noteId = it.arguments?.getInt(AppRouteArgs.NOTE_ID)
-                NoteScreen(if (noteId == -1) null else noteId)
+                val sectionId = it.arguments?.getInt(AppRouteArgs.SECTION_ID)
+                NoteScreen(noteId = noteId, sectionId = sectionId)
             }
             composable(AppRoutes.SETTINGS) {
                 SettingsScreen()
@@ -54,5 +58,5 @@ fun NavController.openSettings() {
 }
 
 fun NavController.openNote(note: Note?) {
-    navigate(AppRoutSchemes.note(note?.id))
+    navigate(AppRoutes.note(id = note?.id, sectionId = note?.sectionId))
 }
