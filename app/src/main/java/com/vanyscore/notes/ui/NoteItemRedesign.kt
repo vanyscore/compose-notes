@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +24,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.vanyscore.notes.domain.Note
 import java.text.SimpleDateFormat
 import java.util.Locale
+import coil3.compose.*
 
 @Composable
 fun NoteItemRedesign(
@@ -37,6 +40,7 @@ fun NoteItemRedesign(
     val dt = note.edited
     val color = title.toColor()
     val formatter = remember { SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()) }
+    val images = note.images
     return Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,6 +73,20 @@ fun NoteItemRedesign(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 ))
+                if (images.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row {
+                        images.map { image ->
+                            AsyncImage(
+                                model = image.uri,
+                                contentDescription = "image",
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .size(50.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
