@@ -11,6 +11,7 @@ import com.vanyscore.notes.data.INoteRepo
 import com.vanyscore.notes.domain.Note
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,21 +26,20 @@ data class NotesState(
     val isLoading: Boolean = false
 )
 
-@HiltViewModel
-class NotesViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = NotesViewModel.Factory::class)
+class NotesViewModel @AssistedInject constructor(
     private val repo: INoteRepo,
     private val appViewModel: AppViewModel,
+    @Assisted
+    private val sectionId: Int? = null,
 ) : ViewModel(), DatesSelectedChecker {
 
     private val _state = MutableStateFlow(NotesState())
     val state = _state.asStateFlow()
 
-    var sectionId: Int? = null
-
     private var _currentDate: Date? = null
 
-    fun init(sectionId: Int?) {
-        this.sectionId = sectionId
+    init {
         viewModelScope.launch {
             EventBus.eventsSource.collect {
                 if (it == Event.NOTES_UPDATED) {
@@ -55,7 +55,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun refresh() {
+    private fun refresh() {
         viewModelScope.launch {
             val state = _state.value
             _state.update {
@@ -82,5 +82,10 @@ class NotesViewModel @Inject constructor(
     override suspend fun getSelectedDatesAsMillis(startDate: Date, endDate: Date): List<Long> {
         val notes = repo.getNotes(fromDate = startDate, toDate = endDate)
         return notes.map { dt -> dt.created.time }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(sectionId: Int?): NotesViewModel
     }
 }

@@ -23,8 +23,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,17 +52,11 @@ fun NoteScreen(
     val appViewModel = LocalAppViewModel.current
     val appState = appViewModel.state.collectAsState()
     val navController = LocalRootNavController.current
-    val isViewModelInit = remember {
-        mutableStateOf(false)
-    }
-
-    val viewModel = hiltViewModel<NoteViewModel>().apply {
-        // TODO(vanyscore): Need refactor.
-        if (!isViewModelInit.value && noteId != null) {
-            attachArgs(noteId, sectionId)
-            isViewModelInit.value = true
+    val viewModel: NoteViewModel = hiltViewModel(
+        creationCallback = { factory: NoteViewModel.Factory ->
+            factory.create(noteId, sectionId)
         }
-    }
+    )
     val state = viewModel.state.collectAsState()
     val note = state.value.note
     if (state.value.canClose) {

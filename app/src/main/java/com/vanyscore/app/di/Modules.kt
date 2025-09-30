@@ -13,14 +13,14 @@ import com.vanyscore.tasks.data.TaskRepoRoom
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.io.File
-import javax.inject.Singleton
 
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(SingletonComponent::class, ViewModelComponent::class)
 class DatabaseModule {
     @Provides
     fun database(
@@ -36,18 +36,17 @@ class DatabaseModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-class ViewModelModules {
+class ViewModelModule {
     @Provides
-    @Singleton
-    fun appViewModel(
-        appStorage: IAppStorage
+    fun provideAppViewModel(
+        storage: IAppStorage
     ): AppViewModel {
-        return AppViewModel(appStorage)
+        return AppViewModel(appStorage = storage)
     }
 }
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(SingletonComponent::class, ViewModelComponent::class)
 class Modules {
     @Provides
     fun noteRepo(

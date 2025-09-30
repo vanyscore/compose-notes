@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.notes.data.INoteRepo
 import com.vanyscore.notes.domain.Note
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
-import javax.inject.Inject
 
 data class NoteState(
     val note: Note,
@@ -23,18 +25,32 @@ data class NoteState(
     val isEdit: Boolean = true,
 )
 
-@HiltViewModel
-class NoteViewModel @Inject constructor(
-    private val repo: INoteRepo
+@HiltViewModel(assistedFactory = NoteViewModel.Factory::class)
+class NoteViewModel @AssistedInject constructor(
+    private val repo: INoteRepo,
+    @Assisted(value = "noteId")
+    private val noteId: Int?,
+    @Assisted(value = "sectionId")
+    private val sectionId: Int?
 ) : ViewModel() {
-
-    private var noteId: Int? = null
-    private var sectionId: Int? = null
 
     private val _state = MutableStateFlow(NoteState(
         note = Note()
     ))
     val state = _state.asStateFlow()
+
+    init {
+        if (sectionId != null) {
+            _state.update {
+                it.copy(
+                    note = _state.value.note.copy(
+                        sectionId = sectionId
+                    )
+                )
+            }
+        }
+        refresh()
+    }
 
     private fun refresh() {
         val noteId = this.noteId ?: return
@@ -49,24 +65,6 @@ class NoteViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-
-    fun attachArgs(noteId: Int?, sectionId: Int?) {
-        this.noteId = noteId
-        this.sectionId = sectionId
-
-        if (sectionId != null) {
-            _state.update {
-                it.copy(
-                    note = _state.value.note.copy(
-                        sectionId = sectionId
-                    )
-                )
-            }
-        }
-
-        refresh()
     }
 
     fun updateNote(copy: Note) {
@@ -155,5 +153,15 @@ class NoteViewModel @Inject constructor(
                 isEdit = isEdit
             )
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("noteId")
+            noteId: Int?,
+            @Assisted("sectionId")
+            sectionId: Int?
+        ): NoteViewModel
     }
 }

@@ -1,6 +1,5 @@
 package com.vanyscore.notes.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,15 +41,14 @@ import com.vanyscore.notes.viewmodel.NotesViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesScreen(
-    viewModel: NotesViewModel = hiltViewModel(),
     sectionId: Int? = null,
     openNote: (Note?) -> Unit,
 ) {
-
-    LaunchedEffect(sectionId) {
-        viewModel.init(sectionId = sectionId)
-    }
-
+    val viewModel: NotesViewModel = hiltViewModel(
+        creationCallback = { factory: NotesViewModel.Factory ->
+            factory.create(sectionId)
+        }
+    )
     val state = viewModel.state.collectAsState().value
     val notes = state.notes
     val navController = LocalInnerNavController.current
