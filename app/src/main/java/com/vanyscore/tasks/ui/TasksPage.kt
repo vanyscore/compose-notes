@@ -46,6 +46,7 @@ import com.vanyscore.app.ui.DayPickerBar
 import com.vanyscore.app.ui.DayStatus
 import com.vanyscore.app.ui.DismissBackground
 import com.vanyscore.app.utils.DateUtils
+import com.vanyscore.app.viewmodel.AppViewModel
 import com.vanyscore.app.viewmodel.LocalAppViewModel
 import com.vanyscore.tasks.R
 import com.vanyscore.tasks.data.Task
@@ -87,6 +88,12 @@ fun TasksPage() {
         }
     }
     val appViewModel = LocalAppViewModel.current
+    val appState = appViewModel.state.collectAsState().value
+    val appDate = appState.date
+    val tasksSelectedDate = state.selectedDate
+    if (!DateUtils.isDateEqualsByDay(appDate, tasksSelectedDate)) {
+        viewModel.updateDate(appDate)
+    }
 
     return Scaffold(
         topBar = { DatePickerBar(

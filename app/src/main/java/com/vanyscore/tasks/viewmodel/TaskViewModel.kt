@@ -20,26 +20,11 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskViewModel @Inject constructor(
     private val repository: ITaskRepo,
-    private val appViewModel: AppViewModel
 ) : ViewModel(), DatesSelectedChecker {
 
     private val _state = MutableStateFlow(MainViewState())
     val state: StateFlow<MainViewState>
         get() = _state.asStateFlow()
-
-
-    init {
-        viewModelScope.launch {
-            appViewModel.state.collect { appState ->
-                _state.update {
-                    _state.value.copy(
-                        selectedDate = appState.date
-                    )
-                }
-                refresh()
-            }
-        }
-    }
 
     private fun refresh() {
         viewModelScope.launch {
@@ -62,6 +47,17 @@ class TaskViewModel @Inject constructor(
                     monthTasks = monthTasks
                 )
             }
+        }
+    }
+
+    fun updateDate(date: Date) {
+        viewModelScope.launch {
+            _state.update {
+                _state.value.copy(
+                    selectedDate = date
+                )
+            }
+            refresh()
         }
     }
 
