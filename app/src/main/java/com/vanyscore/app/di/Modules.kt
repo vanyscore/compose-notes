@@ -7,8 +7,10 @@ import com.vanyscore.app.data.IAppStorage
 import com.vanyscore.app.room.AppDatabase
 import com.vanyscore.app.viewmodel.AppViewModel
 import com.vanyscore.notes.data.INoteRepo
+import com.vanyscore.notes.data.NoteRepoInMemory
 import com.vanyscore.notes.data.NoteRepoRoom
 import com.vanyscore.tasks.data.ITaskRepo
+import com.vanyscore.tasks.data.TaskRepoInMemory
 import com.vanyscore.tasks.data.TaskRepoRoom
 import dagger.Module
 import dagger.Provides
@@ -54,20 +56,25 @@ class Modules {
         context: Context,
         database: AppDatabase,
     ): INoteRepo {
-        return NoteRepoRoom(
-            dao = database.notesDao(),
-            noteSectionsDao = database.noteSectionsDao(),
+        return NoteRepoInMemory(
             contentResolver = context.contentResolver,
-            outputImagesDir = File(context.filesDir, "/note_images/"),
             cacheDir = context.cacheDir,
         )
+//        return NoteRepoRoom(
+//            dao = database.notesDao(),
+//            noteSectionsDao = database.noteSectionsDao(),
+//            contentResolver = context.contentResolver,
+//            outputImagesDir = File(context.filesDir, "/note_images/"),
+//            cacheDir = context.cacheDir,
+//        )
     }
 
     @Provides
     fun tasksRepo(database: AppDatabase): ITaskRepo {
-        return TaskRepoRoom(
-            database.tasksDao()
-        )
+        return TaskRepoInMemory()
+//        return TaskRepoRoom(
+//            database.tasksDao()
+//        )
     }
 
     @Provides

@@ -74,7 +74,7 @@ fun NotesScreen(
                     ) {
                         Icon(Icons.Default.ArrowBack, "go_back", tint = MaterialTheme.colorScheme.onPrimary)
                     }
-                })
+                },)
             }
         },
         floatingActionButton = {
