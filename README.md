@@ -1,4 +1,4 @@
-# Менджер задач и заметок (Android + Jetpack Compose)
+# Менеджер задач и заметок (Android + Jetpack Compose + DI Hilt + Room)
 
 ## Скриншоты
 
