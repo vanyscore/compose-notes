@@ -1,18 +1,20 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.org.jetbrains.kotlin.android)
     alias(libs.plugins.devtoolsKsp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace 'com.vanyscore.tasks'
-    compileSdk 35
+
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.vanyscore.trackit"
         minSdk 24
-        targetSdk 34
+        targetSdk 36
         versionCode 1
         versionName "1.0"
 
@@ -64,6 +66,7 @@ dependencies {
     implementation platform(libs.androidx.compose.bom)
     implementation libs.androidx.lifecycle.viewModelCompose
     implementation libs.androidx.navigation.compose
+    implementation libs.compose.material.icons
 
     // Room
     implementation(libs.androidx.room.runtime)
@@ -87,4 +90,7 @@ dependencies {
     androidTestImplementation libs.androidx.ui.test.junit4
     debugImplementation libs.androidx.ui.tooling
     debugImplementation libs.androidx.ui.test.manifest
+}
+kotlin {
+    jvmToolchain(21)
 }

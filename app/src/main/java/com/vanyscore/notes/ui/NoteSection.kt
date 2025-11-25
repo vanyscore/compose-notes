@@ -11,13 +11,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxDefaults
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,10 +56,10 @@ fun NoteSection(
 ) {
     val title = section.name
     val color = title.toColor()
-    val dismissState = rememberDismissState(
-        initialValue = DismissValue.Default,
+    val dismissState = rememberSwipeToDismissBoxState(
+        initialValue = SwipeToDismissBoxValue.Settled,
         confirmValueChange = { dismissValue ->
-            if (dismissValue == DismissValue.DismissedToEnd) {
+            if (dismissValue == SwipeToDismissBoxValue.StartToEnd) {
                 onRemove()
                 true
             } else {
@@ -67,13 +67,14 @@ fun NoteSection(
             }
         }
     )
-    return SwipeToDismiss(
+    return SwipeToDismissBox(
         state = dismissState,
-        directions = setOf(DismissDirection.StartToEnd),
-        background = {
+        enableDismissFromStartToEnd = true,
+
+        backgroundContent = {
             DismissBackground()
         },
-        dismissContent = {
+        content = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier

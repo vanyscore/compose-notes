@@ -21,16 +21,15 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -207,21 +206,21 @@ fun TaskItem(
     onTaskEdit: (Task) -> Unit,
     onTaskDelete: (Task) -> Unit
 ) {
-    val swipeState = rememberDismissState(
-        initialValue = DismissValue.Default,
+    val swipeState = rememberSwipeToDismissBoxState(
+        initialValue = SwipeToDismissBoxValue.Settled,
         confirmValueChange = { value ->
-            if (value == DismissValue.DismissedToEnd) {
+            if (value == SwipeToDismissBoxValue.StartToEnd) {
                 onTaskDelete(task)
             }
             true
         }
     )
-    return SwipeToDismiss(
+    return SwipeToDismissBox(
         state = swipeState,
-        background = {
+        backgroundContent = {
             DismissBackground()
         },
-        dismissContent = {
+        content = {
             Box(modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxWidth()
@@ -247,6 +246,6 @@ fun TaskItem(
                 }
             }
         },
-        directions = setOf(DismissDirection.StartToEnd)
+        enableDismissFromStartToEnd = true
     )
 }
