@@ -18,7 +18,11 @@ import java.util.Date
 data class NoteSectionRoom(
     @PrimaryKey(autoGenerate = true)
     val id: Int? = null,
-    val name: String
+    val name: String? = null,
+    @TypeConverters(value = [DateConverter::class])
+    val createdDate: Date? = null,
+    @TypeConverters(value = [DateConverter::class])
+    val updatedDate: Date? = null,
 )
 
 @Entity(tableName = "notes")

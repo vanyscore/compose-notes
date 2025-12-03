@@ -49,7 +49,11 @@ class NoteSectionsViewModel @Inject constructor(
                         sections.sortedByDescending { it.name }
                     }
                 } else if (type == SortType.DATE) {
-                    // TODO: Add date to NOTE_SECTION.
+                    sections = if (isAscending) {
+                        sections.sortedBy { it.updatedDate }
+                    } else {
+                        sections.sortedByDescending { it.updatedDate }
+                    }
                 }
             }
 

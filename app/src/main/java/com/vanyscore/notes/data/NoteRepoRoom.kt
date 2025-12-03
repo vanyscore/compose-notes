@@ -34,19 +34,30 @@ class NoteRepoRoom(
     }
 
     override suspend fun createNoteSection(name: String): NoteSection {
-        val section = NoteSectionRoom(name = name)
+        val section = NoteSectionRoom(
+            name = name,
+            createdDate = Calendar.getInstance().time,
+            updatedDate = Calendar.getInstance().time
+        )
         val id = noteSectionsDao.createNoteSection(section)
-        return NoteSection(id = id.toInt(), name = name)
+        val updatedSection = section.copy(
+            id = id.toInt()
+        ).toDomain()
+        // TODO: Add error handling
+        if (updatedSection == null) throw Exception("Error create note_section")
+        return updatedSection
     }
 
     override suspend fun editNoteSection(noteSection: NoteSection): NoteSection {
-        val room = noteSection.toRoom()
+        val room = noteSection.toRoom().copy(
+            updatedDate = Calendar.getInstance().time
+        )
         noteSectionsDao.updateNoteSection(room)
         return noteSection
     }
 
     override suspend fun deleteNoteSection(id: Int) {
-        val room = NoteSectionRoom(id = id, name = "")
+        val room = NoteSectionRoom(id = id)
         noteSectionsDao.deleteNoteSection(room)
     }
 

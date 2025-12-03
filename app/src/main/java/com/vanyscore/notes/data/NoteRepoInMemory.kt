@@ -34,7 +34,10 @@ class NoteRepoInMemory(
         "Workout Routine",
         "Creative Writing"
     ).mapIndexed { index, title ->
-        NoteSection(index + 1, title)
+        NoteSection(index + 1, title,
+            createdDate = Calendar.getInstance().time,
+            updatedDate = Calendar.getInstance().time
+        )
     }.toMutableList()
 
     init {
@@ -119,7 +122,10 @@ class NoteRepoInMemory(
     }
 
     override suspend fun createNoteSection(name: String): NoteSection {
-        val newSection = NoteSection(_noteSections.size + 1, name)
+        val newSection = NoteSection(_noteSections.size + 1, name = name,
+            createdDate = Calendar.getInstance().time,
+            updatedDate = Calendar.getInstance().time
+        )
         _noteSections.add(newSection)
         return newSection
     }
