@@ -6,9 +6,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,13 +22,22 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.vanyscore.app.ui.DismissBackground
 import com.vanyscore.notes.domain.NoteSection
+import com.vanyscore.tasks.R
+import java.text.SimpleDateFormat
+import java.util.Locale
 import kotlin.math.abs
 
 fun String.toColor(): Color {
@@ -67,6 +79,8 @@ fun NoteSection(
             }
         }
     )
+    val formatter = remember { SimpleDateFormat("dd:MM:yyyy HH:mm", Locale.getDefault()) }
+    val sectionDate = section.updatedDate
     return SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = true,
@@ -94,9 +108,21 @@ fun NoteSection(
                         .size(20.dp, 50.dp)
                         .background(color = color)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(title)
-                Spacer(modifier = Modifier.width(8.dp))
+                Column(
+                    modifier = Modifier.padding(
+                        horizontal = 8.dp
+                    )
+                ) {
+                    Text(title, style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.W500
+                    ))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("${stringResource(R.string.updated)}: ${formatter.format(sectionDate)}", style = TextStyle(
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.W300
+                    ))
+                }
             }
         }
     )

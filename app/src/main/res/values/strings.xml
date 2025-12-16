@@ -25,4 +25,5 @@
     <string name="theme_pick">Pick theme</string>
     <string name="last_change">Last change: %s</string>
     <string name="dark_theme">Dark theme</string>
+    <string name="updated">Updated</string>
 </resources>
