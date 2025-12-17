@@ -7,22 +7,22 @@ import com.vanyscore.app.data.IAppStorage
 import com.vanyscore.app.room.AppDatabase
 import com.vanyscore.app.viewmodel.AppViewModel
 import com.vanyscore.notes.data.INoteRepo
+import com.vanyscore.notes.data.INoteSectionRepo
+import com.vanyscore.notes.data.InMemoryInitializer
 import com.vanyscore.notes.data.NoteRepoInMemory
-import com.vanyscore.notes.data.NoteRepoRoom
+import com.vanyscore.notes.data.NoteSectionRepoInMemory
 import com.vanyscore.tasks.data.ITaskRepo
 import com.vanyscore.tasks.data.TaskRepoInMemory
-import com.vanyscore.tasks.data.TaskRepoRoom
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.io.File
+import javax.inject.Singleton
 
 
 @Module
-@InstallIn(SingletonComponent::class, ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 class DatabaseModule {
     @Provides
     fun database(
@@ -48,9 +48,10 @@ class ViewModelModule {
 }
 
 @Module
-@InstallIn(SingletonComponent::class, ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 class Modules {
     @Provides
+    @Singleton
     fun noteRepo(
         @ApplicationContext
         context: Context,
@@ -70,6 +71,18 @@ class Modules {
     }
 
     @Provides
+    @Singleton
+    fun noteSectionRepo(
+        database: AppDatabase,
+    ): INoteSectionRepo {
+        return NoteSectionRepoInMemory()
+//        return NoteSectionRepo(
+//            noteSectionsDao = database.noteSectionsDao(),
+//        )
+    }
+
+    @Provides
+    @Singleton
     fun tasksRepo(database: AppDatabase): ITaskRepo {
         return TaskRepoInMemory()
 //        return TaskRepoRoom(

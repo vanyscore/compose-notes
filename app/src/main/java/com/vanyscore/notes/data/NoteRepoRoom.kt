@@ -2,7 +2,6 @@ package com.vanyscore.notes.data
 
 import android.content.ContentResolver
 import android.net.Uri
-import android.util.Log
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.vanyscore.app.domain.EventBus
@@ -11,10 +10,7 @@ import com.vanyscore.app.utils.FileUtil
 import com.vanyscore.app.utils.Logger
 import com.vanyscore.notes.domain.Note
 import com.vanyscore.notes.domain.NoteImage
-import com.vanyscore.notes.domain.NoteSection
 import com.vanyscore.notes.domain.moveIfItTemporary
-import com.vanyscore.notes.domain.toDomain
-import com.vanyscore.notes.domain.toRoom
 import java.io.File
 import java.util.Calendar
 import java.util.Date
@@ -27,39 +23,6 @@ class NoteRepoRoom(
     private val outputImagesDir: File,
     private val cacheDir: File,
 ) : INoteRepo {
-    override suspend fun getNoteSections(): List<NoteSection> {
-        return noteSectionsDao.getNoteSections().mapNotNull {
-            it.toDomain()
-        }
-    }
-
-    override suspend fun createNoteSection(name: String): NoteSection {
-        val section = NoteSectionRoom(
-            name = name,
-            createdDate = Calendar.getInstance().time,
-            updatedDate = Calendar.getInstance().time
-        )
-        val id = noteSectionsDao.createNoteSection(section)
-        val updatedSection = section.copy(
-            id = id.toInt()
-        ).toDomain()
-        // TODO: Add error handling
-        if (updatedSection == null) throw Exception("Error create note_section")
-        return updatedSection
-    }
-
-    override suspend fun editNoteSection(noteSection: NoteSection): NoteSection {
-        val room = noteSection.toRoom().copy(
-            updatedDate = Calendar.getInstance().time
-        )
-        noteSectionsDao.updateNoteSection(room)
-        return noteSection
-    }
-
-    override suspend fun deleteNoteSection(id: Int) {
-        val room = NoteSectionRoom(id = id)
-        noteSectionsDao.deleteNoteSection(room)
-    }
 
     override suspend fun createNote(note: Note) {
         val noteId = dao.createNote(note.toRoom()).toInt()

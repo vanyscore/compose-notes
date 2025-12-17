@@ -1,11 +1,11 @@
 package com.vanyscore.notes.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vanyscore.app.domain.Event
 import com.vanyscore.app.domain.EventBus
 import com.vanyscore.app.ui.DatesSelectedChecker
+import com.vanyscore.app.utils.Logger
 import com.vanyscore.app.viewmodel.AppViewModel
 import com.vanyscore.notes.data.INoteRepo
 import com.vanyscore.notes.domain.Note
@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
-import javax.inject.Inject
 
 data class NotesState(
     val notes: List<Note> = emptyList(),
@@ -68,6 +67,7 @@ class NotesViewModel @AssistedInject constructor(
             val notes = if (sectionId == null) {
                 repo.getNotes(currentDate)
             } else {
+                Logger.log("Get notes by sectionId: $sectionId")
                 repo.getNotes(sectionId)
             }
             _state.update {

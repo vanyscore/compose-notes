@@ -6,13 +6,6 @@ import com.vanyscore.notes.domain.NoteSection
 import java.util.Date
 
 interface INoteRepo {
-    // Sections
-    suspend fun getNoteSections(): List<NoteSection>
-    suspend fun createNoteSection(name: String): NoteSection
-    suspend fun editNoteSection(noteSection: NoteSection): NoteSection
-    suspend fun deleteNoteSection(id: Int)
-
-    // Notes
     suspend fun createNote(note: Note)
     suspend fun attachImage(note: Note, uri: Uri): Note?
     suspend fun getNotes(fromDate: Date, toDate: Date): List<Note>

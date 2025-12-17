@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vanyscore.app.utils.Logger
 import com.vanyscore.notes.data.INoteRepo
 import com.vanyscore.notes.domain.Note
 import dagger.assisted.Assisted
@@ -113,12 +114,15 @@ class NoteViewModel @AssistedInject constructor(
             if (note.id == null) {
                 repo.createNote(note.copy(
                     created = forDate,
-                    edited = forDate
+                    edited = forDate,
+                    sectionId = sectionId
                 ))
+                Logger.log("Created with sectionId: $sectionId")
             } else {
                 repo.updateNote(note.copy(
                     edited = currentDate
                 ))
+                Logger.log("Note updated: $note")
             }
             _state.update {
                 it.copy(

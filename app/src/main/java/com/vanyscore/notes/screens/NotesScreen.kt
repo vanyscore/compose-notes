@@ -1,5 +1,6 @@
 package com.vanyscore.notes.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vanyscore.app.LocalInnerNavController
 import com.vanyscore.app.ui.DatePickerBar
+import com.vanyscore.app.utils.Logger
 import com.vanyscore.notes.domain.Note
 import com.vanyscore.notes.ui.NoteItemRedesign
 import com.vanyscore.notes.viewmodel.NotesViewModel
@@ -46,6 +48,7 @@ fun NotesScreen(
     sectionId: Int? = null,
     openNote: (Note?) -> Unit,
 ) {
+    Logger.log("NoteScreen: sectionId: $sectionId")
     val viewModel: NotesViewModel = hiltViewModel(
         creationCallback = { factory: NotesViewModel.Factory ->
             factory.create(sectionId)

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.vanyscore.app.ui.SortState
 import com.vanyscore.app.ui.SortType
 import com.vanyscore.notes.data.INoteRepo
+import com.vanyscore.notes.data.INoteSectionRepo
 import com.vanyscore.notes.domain.NoteSection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,7 @@ data class NoteSectionsState(
 
 @HiltViewModel
 class NoteSectionsViewModel @Inject constructor(
-    private val repo: INoteRepo
+    private val repo: INoteSectionRepo
 ): ViewModel() {
     private val _state = MutableStateFlow(NoteSectionsState(
         isLoading = true,
